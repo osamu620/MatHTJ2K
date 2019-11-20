@@ -11,12 +11,23 @@ for c = 0:main_header.SIZ.Csiz - 1
     [~, codingStyleComponent] = get_coding_Styles(main_header, currentTile.header, c);
     % determine ROI shift value
     if isempty(currentTile.header.RGN) == false
-        ROIshift = int32(currentTile.header.RGN.SPrgn);
+        currentRGN = currentTile.header.RGN;
+        if currentRGN.Crgn == c
+            ROIshift = int32(currentRGN.SPrgn);
+        else
+            ROIshift = int32(0);
+        end
     elseif isempty(main_header.RGN) == false
-        ROIshift = int32(main_header.RGN.SPrgn);
+        currentRGN = main_header.RGN;
+        if currentRGN.Crgn == c
+            ROIshift = int32(currentRGN.SPrgn);
+        else
+            ROIshift = int32(0);
+        end
     else
         ROIshift = int32(0);
     end
+    
     NL = codingStyleComponent.get_number_of_decomposition_levels();
     for r = 0:NL
         currentResolution = currentTile.resolution(uint16(r) + g_resolution_idx + M_OFFSET);

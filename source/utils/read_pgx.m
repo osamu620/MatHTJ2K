@@ -3,57 +3,55 @@ function out = read_pgx(file_name)
 fid = fopen(file_name, 'r');
 assert(fid ~= -1, 'file %s is not found.', file_name);
 
-assert(fread(fid, 1, '*char') == 'P');
-assert(fread(fid, 1, '*char') == 'G');
+[HEADER0] = textscan(fid, '%s %s %s', 1, 'Delimiter', {' ', '\n'}, 'MultipleDelimsAsOne',1);
 
-a = fread(fid, 1, '*char');
-while a == ' '
-   a = fread(fid, 1, '*char');
-end
+assert(strcmp(HEADER0{1}{1}, 'PG'));
 
 Endian = 'b';
-if a == 'L'
-    assert(fread(fid, 1, '*char') == 'M');
+if strcmp(HEADER0{2}{1}, 'LM') == true
     Endian = 'l';
-else
-    assert(a == 'M');
-    assert(fread(fid, 1, '*char') == 'L');
 end
-
-a = fread(fid, 1, '*char');
-while a == ' '
-   a = fread(fid, 1, '*char');
-end
-
-is_signed = false;
-if a == '-'
-    is_signed = true;
-end
-
-bitDepth = 0;
-%a = fread(fid, 1, '*char');
-while a ~= ' '
-    if a == '+' || a == '-'
-        a = fread(fid, 1, '*char');
+is_signed = {};
+S = HEADER0{3}{1};
+if length(S) ~= 1
+    if strcmp(S(1), '+') == true
+        is_signed = false;
+        bitDepth = str2double(S(2:end));
+    elseif strcmp(S(1), '-') == true
+        is_signed = true;
+        bitDepth = str2double(S(2:end));
+    else
+        bitDepth = str2double(S);
     end
-    bitDepth = bitDepth*10 + str2num(a);
-    a = fread(fid, 1, '*char');
+else
+    if strcmp(S(1), '+') == true
+        is_signed = false;
+    elseif strcmp(S(1), '-') == true
+        is_signed = true;
+    else
+        bitDepth = str2double(S(1));
+    end
 end
 
-width = 0;
-a = fread(fid, 1, '*char');
-while a ~= ' '
-    width = width*10 + str2num(a);
-    a = fread(fid, 1, '*char');
-end
-
-height = 0;
-a = fread(fid, 1, '*char');
-while a ~= 10 && a~= 13
-    height = height*10 + str2num(a);
-    a = fread(fid, 1, '*char');
-    if a == '\n'
-        a = fread(fid, 1, '*char');
+if length(S) ~= 1
+    if isempty(is_signed) == true
+        is_signed = false;
+    end
+    HEADER1 = textscan(fid, '%d %d', 1, 'Delimiter', {' ', '\n'}, 'MultipleDelimsAsOne',1);
+    width = double(HEADER1{1});
+    height = double(HEADER1{2});
+else
+    if isempty(is_signed) == true
+        is_signed = false;
+        bitDepth = str2double(S(1));
+        HEADER1 = textscan(fid, '%d %d', 1, 'Delimiter', {' ', '\n'}, 'MultipleDelimsAsOne',1);
+        width = double(HEADER1{1});
+        height = double(HEADER1{2});
+    else
+        HEADER1 = textscan(fid, '%d %d %d', 1, 'Delimiter', {' ', '\n'}, 'MultipleDelimsAsOne',1);
+        bitDepth = double(HEADER1{1});
+        width = double(HEADER1{2});
+        height = double(HEADER1{3});
     end
 end
 
@@ -79,8 +77,5 @@ elseif byte_per_sample == 4
         tmp = fread(fid, num_samples, 'uint32', Endian);
     end
 end
-    
+
 out = reshape(tmp, [width height])';
-
-
-
