@@ -27,10 +27,12 @@ for n1 = 1:num_v_stripe
         for j = j_start:j_start + width - 1
             for i = i_start:i_start + height - 1
                 N = dummy_sigma(i:i+2, j:j+2);
-                if CB_CAUSAL == true
-                    N(3, :) = 0;
-                end
                 N_tilda = getScanCausalNeighbours(dummy_r, i, j , dummy_scan);
+                if CB_CAUSAL == true && i == i_start + height - 1
+                    N(3, :) = 0;
+                    N_tilda(3, :) = 0;
+                end
+                
                 [refine_indicator(i,j), refine_val(i,j)] = decodeSigPropMag(state_SP_dec, s_sigma(i,j), ...
                     refine_indicator(i,j), refine_val(i,j), N, N_tilda);
                 dummy_r(2:end-1, 2:end-1) = refine_val;
@@ -52,10 +54,11 @@ for n1 = 1:num_v_stripe
         for j = j_start:j_start + width_last - 1
             for i = i_start:i_start + height - 1
                 N = dummy_sigma(i:i+2, j:j+2);
-                if CB_CAUSAL == true
-                    N(3, :) = 0;
-                end
                 N_tilda = getScanCausalNeighbours(dummy_r, i, j , dummy_scan);
+                if CB_CAUSAL == true && i == i_start + height - 1
+                    N(3, :) = 0;
+                    N_tilda(3, :) = 0;
+                end
                 [refine_indicator(i,j), refine_val(i,j)] = decodeSigPropMag(state_SP_dec, s_sigma(i,j), ...
                     refine_indicator(i,j), refine_val(i,j), N, N_tilda);
                 dummy_r(2:end-1, 2:end-1) = refine_val;
@@ -79,10 +82,11 @@ for n2 = 1:num_h_stripe
     for j = j_start:j_start + width - 1
         for i = i_start:i_start + height - 1
             N = dummy_sigma(i:i+2, j:j+2);
-            if CB_CAUSAL == true
-                N(3, :) = 0;
-            end
             N_tilda = getScanCausalNeighbours(dummy_r, i, j , dummy_scan);
+            if CB_CAUSAL == true && i == i_start + height - 1
+                N(3, :) = 0;
+                N_tilda(3, :) = 0;
+            end
             [refine_indicator(i,j), refine_val(i,j)] = decodeSigPropMag(state_SP_dec, s_sigma(i,j), ...
                 refine_indicator(i,j), refine_val(i,j), N, N_tilda);
             dummy_r(2:end-1, 2:end-1) = refine_val;
@@ -104,10 +108,11 @@ if width_last ~= 0
     for j = j_start:j_start + width_last - 1
         for i = i_start:i_start + height - 1
             N = dummy_sigma(i:i+2, j:j+2);
-            if CB_CAUSAL == true
-                N(3, :) = 0;
-            end
             N_tilda = getScanCausalNeighbours(dummy_r, i, j , dummy_scan);
+            if CB_CAUSAL == true && i == i_start + height - 1
+                N(3, :) = 0;
+                N_tilda(3, :) = 0;
+            end
             [refine_indicator(i,j), refine_val(i,j)] = decodeSigPropMag(state_SP_dec, s_sigma(i,j), ...
                 refine_indicator(i,j), refine_val(i,j), N, N_tilda);
             dummy_r(2:end-1, 2:end-1) = refine_val;
