@@ -59,6 +59,7 @@ classdef jp2_inputArguments < handle
         function [main_header, tilepart_header, numTiles_x, numTiles_y, use_SOP, use_PPM, use_TLM, use_PPT, use_PLT] = parse_args(inObj, argin)
             M_OFFSET = 1;
             %% parse and check input arguments
+            tilepart_header = [];
             if isempty(argin) == false
                 n_arg = size(argin, 2);
                 assert(mod(n_arg, 2) == 0 && n_arg >= 2, 'Number of entries for coding parameters shall be even. Please check the input arguments.');
@@ -84,7 +85,6 @@ classdef jp2_inputArguments < handle
                 numTiles = numTiles * ceil_quotient_int((inObj.img_size_x - inObj.tile_origin(2)), inObj.tile(2), 'double');
                 numTiles = numTiles * ceil_quotient_int((inObj.img_size_y - inObj.tile_origin(1)), inObj.tile(1), 'double');
                 
-                tilepart_header = [];
                 for i = 0:numTiles-1
                     tilepart_header = [tilepart_header j2k_tile_part_header(i)];
                     tilepart_header(end).idx = i;
