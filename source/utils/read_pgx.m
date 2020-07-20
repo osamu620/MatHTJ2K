@@ -3,55 +3,53 @@ function out = read_pgx(file_name)
 fid = fopen(file_name, 'r');
 assert(fid ~= -1, 'file %s is not found.', file_name);
 
-[HEADER0] = textscan(fid, '%s %s %s', 1, 'Delimiter', {' ', '\n'}, 'MultipleDelimsAsOne',1);
+assert(fread(fid, 1, 'uint8') == uint8('P'));
+assert(fread(fid, 1, 'uint8') == uint8('G'));
 
-assert(strcmp(HEADER0{1}{1}, 'PG'));
-
+a = eat_space(fid);
 Endian = 'b';
-if strcmp(HEADER0{2}{1}, 'LM') == true
+if a == uint8('L')
+    assert(fread(fid, 1, 'uint8') == uint8('M'));
     Endian = 'l';
-end
-is_signed = {};
-S = HEADER0{3}{1};
-if length(S) ~= 1
-    if strcmp(S(1), '+') == true
-        is_signed = false;
-        bitDepth = str2double(S(2:end));
-    elseif strcmp(S(1), '-') == true
-        is_signed = true;
-        bitDepth = str2double(S(2:end));
-    else
-        bitDepth = str2double(S);
-    end
 else
-    if strcmp(S(1), '+') == true
-        is_signed = false;
-    elseif strcmp(S(1), '-') == true
-        is_signed = true;
-    else
-        bitDepth = str2double(S(1));
-    end
+    assert(a == uint8('M'));
+    assert(fread(fid, 1, 'uint8') == uint8('L'));
 end
 
-if length(S) ~= 1
-    if isempty(is_signed) == true
-        is_signed = false;
+a = eat_space(fid);
+is_signed = false;
+if a == uint8('+') || a == uint8('-')
+    if a == uint8('-')
+        is_signed = true;
     end
-    HEADER1 = textscan(fid, '%d %d', 1, 'Delimiter', {' ', '\n'}, 'MultipleDelimsAsOne',1);
-    width = double(HEADER1{1});
-    height = double(HEADER1{2});
-else
-    if isempty(is_signed) == true
-        is_signed = false;
-        bitDepth = str2double(S(1));
-        HEADER1 = textscan(fid, '%d %d', 1, 'Delimiter', {' ', '\n'}, 'MultipleDelimsAsOne',1);
-        width = double(HEADER1{1});
-        height = double(HEADER1{2});
-    else
-        HEADER1 = textscan(fid, '%d %d %d', 1, 'Delimiter', {' ', '\n'}, 'MultipleDelimsAsOne',1);
-        bitDepth = double(HEADER1{1});
-        width = double(HEADER1{2});
-        height = double(HEADER1{3});
+    
+    a = eat_space(fid);
+end
+bitDepth = 0;
+
+while a ~= ' '
+    %     if a == '+' || a == '-'
+    %         a = fread(fid, 1, '*char');
+    %     end
+    bitDepth = bitDepth*10 + double(a) - 48;
+    a = fread(fid, 1, 'uint8');
+end
+
+a = eat_space(fid);
+width = 0;
+while a ~= ' '
+    width = width*10 + double(a) - 48;
+    a = fread(fid, 1, 'uint8');
+end
+
+
+a = eat_space(fid);
+height = 0;
+while a ~= 10 && a~= 13
+    height = height*10 + double(a) - 48;
+    a = fread(fid, 1, 'uint8');
+    if a == uint8('\n')
+        a = fread(fid, 1, 'uint8');
     end
 end
 
@@ -79,3 +77,14 @@ elseif byte_per_sample == 4
 end
 
 out = reshape(tmp, [width height])';
+end
+
+function out = eat_space(fid)
+out = fread(fid, 1, 'uint8');
+while out == uint8(' ') || out == 10 || out == 13
+    out = fread(fid, 1, 'uint8');
+end
+end
+
+
+
