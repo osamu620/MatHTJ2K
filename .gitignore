@@ -1,3 +1,9 @@
 .DS_Store
 codegen/
-*.prj
+*.mexmaci64
+*.mexw64
+*.mexa64
+*.j2c
+*.jp2
+*.j2k
+*.jph
