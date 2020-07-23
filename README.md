@@ -3,7 +3,7 @@ MatHTJ2K
 
 MatHTJ2K is an implementation of JPEG 2000 Part 1 and Part 15 as defined in Rec. ITU-T T.800 | ISO/IEC 15444-1 and Rec. ITU-T T.814 | ISO/IEC 15444-15, written in MATLAB language.
 
-## Description 
+## 1. Description 
 
 High Throughput JPEG 2000 (HTJ2K) is a new part of JPEG 2000 standard. The purpose of MatHTJ2K is to help a person who wants to develop an HTJ2K-based image compression system to understand the algorithms defined in HTJ2K. 
 
@@ -13,12 +13,12 @@ What you can do with MatHTJ2K are:
 - to decompress a codestream which is compliant with JPEG 2000 Part 1 or Part 15 into an image.
 - to read/to write .jp2 and .jph file.
 
-## Prerequisites
+## 2. Prerequisites
 
 - MATLAB 2018b or higher with Image processing toolbox (older version may be fine, but not tested.)
   - to use MEX version of block-coder, MATLAB Coder is required.
 
-## Install
+## 3. Install
 
 Type the following command in the command window:
 
@@ -26,7 +26,13 @@ Type the following command in the command window:
 
 If you want to save path settings for future session, use `savepath` command.
 
-## Usage
+## 4. Usage
+
+### MEX functions (optional)
+
+To generate MEX functions, type `generate_MEX_files` in the command window.
+
+### Encoding
 
 To compress an image stored in array "IMG", type the following command in the command window:
 
@@ -34,25 +40,31 @@ To compress an image stored in array "IMG", type the following command in the co
 
 `MEXflag` should be `true` if you want to use MEX version of  block-coder.
 
+#### available options to encoder
+
+ please see help (type `help encode_HTJ2K` in the command window)
+
+### Decoding
+
 To decompress a codestream, jp2 or jph, type the following command in the command window:
 
-`[output composited_output] = decode_HTJ2K(filename, MEXflag, number_of_resolution)`
+`[output composited_output] = decode_HTJ2K(filename, MEXflag, reduce_NL)`
 
 `MEXflag` should be `true` if you want to use MEX version of  block-coder.
 
-`number_of_resolution` is number of DWT resolution to be reduced from that of the original codestream/file. 
+`reduce_NL` is number of DWT resolution to be reduced from that of the original codestream/file. 
 
 For further details, please see help encode_HTJ2K/decode_HTJ2K.
 
-## Author
+## 5. Author
 
-- Osamu WATANABE
+- Osamu Watanabe
 
-## License
+## 6. License
 
 The copyright in this software is being made available under the License, included below. This software may be subject to other third party and contributor rights, including patent rights, and no such rights are granted under this license.
 
-Copyright (c) 2018-2019, ISO
+Copyright (c) 2018-2020, Osamu Watanabe
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
