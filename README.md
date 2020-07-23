@@ -64,7 +64,7 @@ For further details, please see help encode_HTJ2K/decode_HTJ2K.
 
 Please cite [this](https://doi.org/10.1109/GCCE46687.2019.9015602) paper if you use MatHTJ2K for your published work.
 
-- O. Watanabe and D. Taubman, "A Matlab Implementation of the Emerging HTJ2K Standard," 2019 IEEE 8th Global Conference on Consumer Electronics (GCCE), Osaka, Japan, 2019, pp. 491-495, doi: 10.1109/GCCE46687.2019.9015602.
+- O. Watanabe and D. Taubman, "A Matlab Implementation of the Emerging HTJ2K Standard," 2019 IEEE 8th Global Conference on Consumer Electronics (GCCE), Osaka, Japan, 2019, pp. 491-495, doi: 10.1109/GCCE46687.2019.9015602
 
 ## License
 
