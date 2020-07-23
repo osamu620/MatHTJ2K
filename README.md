@@ -3,7 +3,7 @@ MatHTJ2K
 
 MatHTJ2K is an implementation of JPEG 2000 Part 1 and Part 15 as defined in Rec. ITU-T T.800 | ISO/IEC 15444-1 and Rec. ITU-T T.814 | ISO/IEC 15444-15, written in MATLAB language.
 
-## 1. Description 
+## Description 
 
 High Throughput JPEG 2000 (HTJ2K) is a new part of JPEG 2000 standard. The purpose of MatHTJ2K is to help a person who wants to develop an HTJ2K-based image compression system to understand the algorithms defined in HTJ2K. 
 
@@ -13,12 +13,12 @@ What you can do with MatHTJ2K are:
 - to decompress a codestream which is compliant with JPEG 2000 Part 1 or Part 15 into an image.
 - to read/to write .jp2 and .jph file.
 
-## 2. Prerequisites
+## Prerequisites
 
 - MATLAB 2018b or higher with Image processing toolbox (older version may be fine, but not tested.)
   - to use MEX version of block-coder, MATLAB Coder is required.
 
-## 3. Install
+## Install
 
 Type the following command in the command window:
 
@@ -26,7 +26,7 @@ Type the following command in the command window:
 
 If you want to save path settings for future session, use `savepath` command.
 
-## 4. Usage
+## Usage
 
 ### MEX functions (optional)
 
@@ -56,11 +56,17 @@ To decompress a codestream, jp2 or jph, type the following command in the comman
 
 For further details, please see help encode_HTJ2K/decode_HTJ2K.
 
-## 5. Author
+## Author
 
 - Osamu Watanabe
 
-## 6. License
+## Citation
+
+Please cite [this](https://doi.org/10.1109/GCCE46687.2019.9015602) paper if you use MatHTJ2K for your published work.
+
+> O. Watanabe and D. Taubman, "A Matlab Implementation of the Emerging HTJ2K Standard," 2019 IEEE 8th Global Conference on Consumer Electronics (GCCE), Osaka, Japan, 2019, pp. 491-495, doi: 10.1109/GCCE46687.2019.9015602.
+
+## License
 
 The copyright in this software is being made available under the License, included below. This software may be subject to other third party and contributor rights, including patent rights, and no such rights are granted under this license.
 
