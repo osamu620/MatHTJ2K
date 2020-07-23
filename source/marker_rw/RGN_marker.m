@@ -17,14 +17,14 @@ classdef RGN_marker < matlab.mixin.Copyable
             end
         end
         function read_RGN(inObj, hDsrc, Csiz)
-            assert(isa(hDsrc,'jp2_data_source'));
-            assert(isa(inObj,'RGN_marker'), 'input for readRGNmarker() shall be RGN_marker class.');
+            assert(isa(hDsrc, 'jp2_data_source'));
+            assert(isa(inObj, 'RGN_marker'), 'input for readRGNmarker() shall be RGN_marker class.');
             inObj.Lrgn = get_word(hDsrc);
             if Csiz < 257
-                assert(inObj.Lrgn ==5);
+                assert(inObj.Lrgn == 5);
                 inObj.Crgn = get_byte(hDsrc);
             else
-                assert(inObj.Lrgn ==6);
+                assert(inObj.Lrgn == 6);
                 inObj.Crgn = get_word(hDsrc);
             end
             inObj.Srgn = get_byte(hDsrc);

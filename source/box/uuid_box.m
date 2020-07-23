@@ -7,10 +7,10 @@ classdef uuid_box < jp2_box_base
         function read_contents(inObj)
             inObj.UUID = get_dword(inObj.DBox);
             for i = 1:3
-                inObj.UUID = inObj.UUID*2^32 + get_dword(inObj.DBox);
+                inObj.UUID = inObj.UUID * 2^32 + get_dword(inObj.DBox);
             end
             if inObj.LBox > 24
-                inObj.DATA = get_N_byte(inObj.DBox, inObj.LBox -(8+16));
+                inObj.DATA = get_N_byte(inObj.DBox, inObj.LBox - (8 + 16));
             end
             inObj.is_read = true;
         end

@@ -9,10 +9,10 @@ else
 end
 
 % convert scanning order
-forward = reshape(makeQuadScanorder(QW/B,QH/B),1,A*QW*A*QH);
+forward = reshape(makeQuadScanorder(QW / B, QH / B), 1, A * QW * A * QH);
 
 tmp = zeros(1, length(in), class(in));
 for i = 1:length(in)
     tmp(i) = in(forward(i));
 end
-out = reshape(tmp,A*QH,A*QW);
+out = reshape(tmp, A * QH, A * QW);

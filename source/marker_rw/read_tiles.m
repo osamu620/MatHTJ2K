@@ -13,33 +13,33 @@ while WORD == JP2markers.SOT
     tile_part_length = tmp_SOT.get_length();
     tile_part_index = tmp_SOT.get_tile_part_index();
     num_tile_parts = tmp_SOT.get_number_of_tile_parts();
-    
+
     currentTile = tile_Set(tile_index + M_OFFSET);
     currentTile.idx = tile_index;
-    
+
     if tile_part_index == 0
         if DEBUG == 1
-            
+
         end
         % only for the first tile-part of a tile
         currentTile.idx_x = uint32(mod(double(tile_index), double(numXtiles)));
         currentTile.idx_y = floor_quotient_int(tile_index, numXtiles, 'uint32');
         %             % NOTE: (p,q) is transposed expression because of MATLAB
-        tx0 = max(main_header.SIZ.XTOsiz + currentTile.idx_x*main_header.SIZ.XTsiz, main_header.SIZ.XOsiz);
-        ty0 = max(main_header.SIZ.YTOsiz + currentTile.idx_y*main_header.SIZ.YTsiz, main_header.SIZ.YOsiz);
-        tx1 = min(main_header.SIZ.XTOsiz + (currentTile.idx_x+1)*main_header.SIZ.XTsiz, main_header.SIZ.Xsiz);
-        ty1 = min(main_header.SIZ.YTOsiz + (currentTile.idx_y+1)*main_header.SIZ.YTsiz, main_header.SIZ.Ysiz);
+        tx0 = max(main_header.SIZ.XTOsiz + currentTile.idx_x * main_header.SIZ.XTsiz, main_header.SIZ.XOsiz);
+        ty0 = max(main_header.SIZ.YTOsiz + currentTile.idx_y * main_header.SIZ.YTsiz, main_header.SIZ.YOsiz);
+        tx1 = min(main_header.SIZ.XTOsiz + (currentTile.idx_x + 1) * main_header.SIZ.XTsiz, main_header.SIZ.Xsiz);
+        ty1 = min(main_header.SIZ.YTOsiz + (currentTile.idx_y + 1) * main_header.SIZ.YTsiz, main_header.SIZ.Ysiz);
         currentTile.tile_pos_x = tx0;
         currentTile.tile_pos_y = ty0;
         currentTile.tile_size_x = tx1 - tx0;
         currentTile.tile_size_y = ty1 - ty0;
-        
+
         if DEBUG == 1
             fprintf('Tile_index = %3d, tile size (x,y) = (%3d,%3d)\n', tile_index, currentTile.tile_size_x, currentTile.tile_size_y);
             fprintf('\ttile_part index = %d, tile_part length = %5d, num_tile_parts = %d\n', ...
                 tile_part_index, tile_part_length, num_tile_parts);
         end
-        
+
         for c = 0:main_header.SIZ.Csiz - 1
             tcx0 = ceil_quotient_int(tx0, main_header.SIZ.XRsiz(c + M_OFFSET), 'uint32');
             tcx1 = ceil_quotient_int(tx1, main_header.SIZ.XRsiz(c + M_OFFSET), 'uint32');
@@ -49,11 +49,11 @@ while WORD == JP2markers.SOT
         end
         % buffer for decoded components
         currentTile.output = cell(main_header.SIZ.Csiz, 1);
-        
+
         %% read a tile-part header for the first tile-part header
         [WORD, numbytes_of_tilepart_headers] = readTilePartHeader(main_header, hDsrc, currentTile, true);
         assert(WORD == JP2markers.SOD);
-        
+
         %% prepare coding units
         % prepare resolution
         for c = 0:main_header.SIZ.Csiz - 1
@@ -96,15 +96,15 @@ while WORD == JP2markers.SOT
             end
             nG = quantStyleComponent.get_number_of_guard_bits();
             for r = 0:NL
-                currentResolution = currentTile.resolution (uint16(r) + g_resolution_idx + M_OFFSET);
+                currentResolution = currentTile.resolution(uint16(r) + g_resolution_idx + M_OFFSET);
                 t2_make_resolution(currentResolution, currentTile, NL, r, c, main_header);
                 if currentResolution.is_empty == false
                     for iPrecinctY = 0:currentResolution.numprecincthigh - 1
                         for jPrecinctX = 0:currentResolution.numprecinctwide - 1
-                            for l = 0:codingStyle.get_number_of_layers() -1
-                                currentTile.packetPointer{c + M_OFFSET, r + M_OFFSET, l + M_OFFSET, jPrecinctX + M_OFFSET, iPrecinctY + M_OFFSET} = jp2_packet(c, r, l, jPrecinctX, iPrecinctY);
+                            for l = 0:codingStyle.get_number_of_layers() - 1
+                                currentTile.packetPointer{c+M_OFFSET, r+M_OFFSET, l+M_OFFSET, jPrecinctX+M_OFFSET, iPrecinctY+M_OFFSET} = jp2_packet(c, r, l, jPrecinctX, iPrecinctY);
                             end
-                            currentPrecinct = currentResolution.precinct_resolution(jPrecinctX + iPrecinctY*currentResolution.numprecinctwide + M_OFFSET);
+                            currentPrecinct = currentResolution.precinct_resolution(jPrecinctX + iPrecinctY * currentResolution.numprecinctwide + M_OFFSET);
                             for b = 1:currentResolution.num_band
                                 currentPband = currentPrecinct.precinct_subbands(b);
                                 t2_make_subband(c, currentResolution, b, currentPband, main_header, ...
@@ -121,10 +121,12 @@ while WORD == JP2markers.SOT
             fprintf('\ttile_part index = %3d, tile_part length = %5d, num_tile_parts = %d\n', ...
                 tile_part_index, tile_part_length, num_tile_parts);
         end
+
         %% read a tile-part header for non-first tile-part header
         [WORD, numbytes_of_tilepart_headers] = readTilePartHeader(main_header, hDsrc, currentTile, false);
         assert(WORD == JP2markers.SOD);
     end
+
     %% read bitstream data in a tile
     currentTile.src_data.buf(currentTile.src_data.pos + M_OFFSET:currentTile.src_data.pos + tile_part_length - numbytes_of_tilepart_headers) = ...
         hDsrc.buf(hDsrc.pos + M_OFFSET:hDsrc.pos + tile_part_length - numbytes_of_tilepart_headers);

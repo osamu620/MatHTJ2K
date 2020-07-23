@@ -14,7 +14,7 @@ while len > 0
         state_VLC.VLC_bits = state_VLC.VLC_bits + 1;
     end
     if state_VLC.VLC_bits == uint8(8)
-        VLC_buf(state_VLC.VLC_pos+M_OFFSET) = state_VLC.VLC_tmp;
+        VLC_buf(state_VLC.VLC_pos + M_OFFSET) = state_VLC.VLC_tmp;
         state_VLC.VLC_pos = state_VLC.VLC_pos + 1;
         state_VLC.VLC_last = state_VLC.VLC_tmp;
         state_VLC.VLC_tmp = uint8(0);

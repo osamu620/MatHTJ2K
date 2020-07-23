@@ -2,7 +2,7 @@ function v_n = decodeMagSgnValue(m_n, i_n, Dcup, Pcup, Lcup, state_MS_dec)
 
 val = uint32(0);
 if m_n > 0
-    for i=0:m_n-1
+    for i = 0:m_n - 1
         bit = importMagSgnBit(Dcup, Pcup, Lcup, state_MS_dec);
         val = val + bitshift(uint32(bit), i);
     end

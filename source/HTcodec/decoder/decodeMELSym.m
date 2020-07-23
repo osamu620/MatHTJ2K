@@ -12,7 +12,7 @@ if state_MEL.MEL_run == 0 && state_MEL.MEL_one == 0
         state_MEL.MEL_run = uint8(0);
         while eval > 0
             bit = importMELbit(Dcup, Lcup, state_MEL_unPacker);
-            state_MEL.MEL_run = 2*state_MEL.MEL_run + bit;
+            state_MEL.MEL_run = 2 * state_MEL.MEL_run + bit;
             eval = eval - uint8(1);
         end
         state_MEL.MEL_k = max(uint8(0), state_MEL.MEL_k - 1);

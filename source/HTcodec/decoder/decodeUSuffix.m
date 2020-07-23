@@ -9,7 +9,7 @@ if u_pfx == 3
     u_sfx = uint8(val);
     return;
 end
-for i=1:5-1
+for i = 1:5 - 1
     bit = importVLCBit(Dcup, Pcup, Lcup, state_VLC_dec);
     val = val + bitshift(bit, i);
 end

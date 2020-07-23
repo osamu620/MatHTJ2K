@@ -9,8 +9,8 @@ classdef SOT_marker < handle
     end
     methods
         function read_SOT(inObj, hDsrc)
-            assert(isa(hDsrc,'jp2_data_source'));
-            assert(isa(inObj,'SOT_marker'), 'input for readSOT() shall be SOT_marker class.');
+            assert(isa(hDsrc, 'jp2_data_source'));
+            assert(isa(inObj, 'SOT_marker'), 'input for readSOT() shall be SOT_marker class.');
             inObj.Lsot = get_word(hDsrc);
             assert(inObj.Lsot == 10, 'Lsot is wrong');
             inObj.Isot = get_word(hDsrc);
@@ -20,8 +20,8 @@ classdef SOT_marker < handle
             inObj.is_read = true;
         end
         function write_SOT(inObj, m, hDdst)
-            assert(isa(hDdst,'jp2_data_destination'));
-            assert(isa(inObj,'SOT_marker'), 'input for writeSOT() shall be SOT_marker class.');
+            assert(isa(hDdst, 'jp2_data_destination'));
+            assert(isa(inObj, 'SOT_marker'), 'input for writeSOT() shall be SOT_marker class.');
             put_word(hDdst, m.SOT); %SOT
             put_word(hDdst, inObj.Lsot);
             put_word(hDdst, inObj.Isot);
@@ -43,11 +43,3 @@ classdef SOT_marker < handle
         end
     end
 end
-
-
-
-
-
-
-
-

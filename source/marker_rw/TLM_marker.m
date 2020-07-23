@@ -3,8 +3,8 @@ classdef TLM_marker < handle
         Ltlm uint16
         Ztlm uint8
         Stlm uint8
-        Ttlm (1,:) uint16
-        Ptlm (1,:) uint32
+        Ttlm(1, :) uint16
+        Ptlm(1, :) uint32
         is_read logical
     end
     methods
@@ -19,22 +19,22 @@ classdef TLM_marker < handle
                         break;
                     end
                 end
-                outObj.Stlm = uint8((SP*4 + ST)*16);
+                outObj.Stlm = uint8((SP * 4 + ST) * 16);
                 outObj.Ztlm = 0;
                 for n = 1:nTile
-                    assert(isinteger(ST) && isinteger(SP) && ST >=0 && ST <= 2 && SP >=0 && SP<= 1);
+                    assert(isinteger(ST) && isinteger(SP) && ST >= 0 && ST <= 2 && SP >= 0 && SP <= 1);
                     if ST ~= 0
                         outObj.Ttlm(n) = n - 1;
                     end
                     outObj.Ptlm(n) = hTile(n).header.SOT.Psot;
                 end
-                outObj.Ltlm = 4 + (SP*2 + (2 + ST))*nTile;
+                outObj.Ltlm = 4 + (SP * 2 + (2 + ST)) * nTile;
             end
             outObj.is_read = false;
         end
         function read_TLM(inObj, hDsrc)
-            assert(isa(hDsrc,'jp2_data_source'));
-            assert(isa(inObj,'TLM_marker'), 'input for read_TLM() shall be TLM_marker class.');
+            assert(isa(hDsrc, 'jp2_data_source'));
+            assert(isa(inObj, 'TLM_marker'), 'input for read_TLM() shall be TLM_marker class.');
             inObj.Ltlm = get_word(hDsrc);
             assert(inObj.Ltlm >= 6 && inObj.Ltlm <= 65535);
             inObj.Ztlm = get_byte(hDsrc);
@@ -43,17 +43,17 @@ classdef TLM_marker < handle
             SP = uint16(bitand(bitshift(inObj.Stlm, -6), 1));
             num_tile_parts = 0;
             if SP == 0
-                num_tile_parts = (inObj.Ltlm - 4)/(2+ST);
+                num_tile_parts = (inObj.Ltlm - 4) / (2 + ST);
             else
                 assert(SP == 1);
-                num_tile_parts = (inObj.Ltlm - 4)/(4+ST);
+                num_tile_parts = (inObj.Ltlm - 4) / (4 + ST);
             end
-             
+
             for i = 1:num_tile_parts
                 if ST == 2
                     inObj.Ttlm(i) = get_word(hDsrc);
                 elseif ST == 1
-                    inObj.Ttlm(i)= get_byte(hDsrc);
+                    inObj.Ttlm(i) = get_byte(hDsrc);
                 end
                 if SP == 0
                     inObj.Ptlm(i) = uint32(get_word(hDsrc));
@@ -64,8 +64,8 @@ classdef TLM_marker < handle
             inObj.is_read = true;
         end
         function write_TLM(inObj, m, hDdst)
-            assert(isa(hDdst,'jp2_data_destination'));
-            assert(isa(inObj,'TLM_marker'), 'input for write_TLM() shall be TLM_marker class.');
+            assert(isa(hDdst, 'jp2_data_destination'));
+            assert(isa(inObj, 'TLM_marker'), 'input for write_TLM() shall be TLM_marker class.');
             hDdst.put_word(m.TLM);
             hDdst.put_word(inObj.Ltlm);
             hDdst.put_byte(inObj.Ztlm);
@@ -74,11 +74,11 @@ classdef TLM_marker < handle
             ST = bitand(bitshift(inObj.Stlm, -4), 3);
             SP = bitshift(inObj.Stlm, -6);
             if SP == 0
-                num_tile_parts = (inObj.Ltlm - 4)/uint16(2+ST);
+                num_tile_parts = (inObj.Ltlm - 4) / uint16(2 + ST);
             else
                 assert(SP == 1);
-                num_tile_parts = (inObj.Ltlm - 4)/uint16(4+ST);
-            end 
+                num_tile_parts = (inObj.Ltlm - 4) / uint16(4 + ST);
+            end
             for i = 1:num_tile_parts
                 if ST ~= 0
                     if ST == 1

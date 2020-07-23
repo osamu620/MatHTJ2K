@@ -1,21 +1,21 @@
 function label = get_context_labels_sig(sig_LUT, hEBCOT_states, j1, j2, band)
 
-scan_window_sigma = hEBCOT_states.dummy_sigma(j1:j1+2, j2:j2+2);
+scan_window_sigma = hEBCOT_states.dummy_sigma(j1:j1 + 2, j2:j2 + 2);
 scan_window_sigma(2, 2) = 0;
 if hEBCOT_states.is_causal == true && mod(j1, 4) == 0
     scan_window_sigma(3, :) = 0;
 end
 
 % scan_window is now ready
-k_h = uint8(scan_window_sigma(2,1)+scan_window_sigma(2,3));% horizontal
-k_v = uint8(scan_window_sigma(1,2)+scan_window_sigma(3,2));% vertical
-k_d = uint8(scan_window_sigma(1,1)+scan_window_sigma(1,3)+scan_window_sigma(3,1)+scan_window_sigma(3,3)); % diagonal
+k_h = uint8(scan_window_sigma(2, 1) + scan_window_sigma(2, 3)); % horizontal
+k_v = uint8(scan_window_sigma(1, 2) + scan_window_sigma(3, 2)); % vertical
+k_d = uint8(scan_window_sigma(1, 1) + scan_window_sigma(1, 3) + scan_window_sigma(3, 1) + scan_window_sigma(3, 3)); % diagonal
 
-label = sig_LUT(uint8(15)*k_h+uint8(5)*k_v+k_d+uint8(1), band+uint8(1));
+label = sig_LUT(uint8(15) * k_h + uint8(5) * k_v + k_d + uint8(1), band + uint8(1));
 
 %% non LUT version
 % switch band
-%     case 0 %% LL 
+%     case 0 %% LL
 %         if (k_h == 2)
 %             label = 8;
 %         end

@@ -16,7 +16,7 @@ while lev < NL
     v0 = currentResolution.try0;
     v1 = currentResolution.try1;
     if u0 == u1 || v0 == v1
-        % if we are here, current resolution is empty. 
+        % if we are here, current resolution is empty.
         break;
     end
     if use_MEX == true

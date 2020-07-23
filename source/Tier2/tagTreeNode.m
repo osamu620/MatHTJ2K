@@ -1,12 +1,12 @@
 classdef tagTreeNode < matlab.mixin.Copyable
     properties
         level uint8
-        parent_idx  int32
-        child_idx  int32
-        idx  int32
-        state  uint8
+        parent_idx int32
+        child_idx int32
+        idx int32
+        state uint8
         current_value uint16
-        value  uint16
+        value uint16
         is_set logical % used only in encoder
     end
     methods

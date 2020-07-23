@@ -13,7 +13,7 @@ while len > 0
     state_MS.MS_tmp = bitor(state_MS.MS_tmp, uint8(bitshift(bit, state_MS.MS_bits)));
     state_MS.MS_bits = state_MS.MS_bits + 1;
     if state_MS.MS_bits == state_MS.MS_max
-        MS_buf(state_MS.MS_pos+M_OFFSET) = state_MS.MS_tmp;
+        MS_buf(state_MS.MS_pos + M_OFFSET) = state_MS.MS_tmp;
         state_MS.MS_pos = state_MS.MS_pos + 1;
         if state_MS.MS_tmp == x_FF
             state_MS.MS_max = uint8(7);
@@ -24,4 +24,3 @@ while len > 0
         state_MS.MS_bits = uint8(0);
     end
 end
-

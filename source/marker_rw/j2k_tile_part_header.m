@@ -70,14 +70,16 @@ classdef j2k_tile_part_header < handle
                 end
             end
         end
+
         %% COD
         function create_COD(inObj, inputArgs)
             obj = findobj(inputArgs.tParam, 'idx', inObj.idx);
             if isempty(obj) == true
                 return;
             end
+
             %% create parameter set for COD marker segment
-            
+
             uSOP = obj.use_SOP;
             cobj = obj;
             while isempty(uSOP)
@@ -92,7 +94,7 @@ classdef j2k_tile_part_header < handle
             if strcmp(uSOP, 'yes')
                 use_SOP = true;
             end
-            
+
             uEPH = obj.use_EPH;
             cobj = obj;
             while isempty(uEPH)
@@ -107,7 +109,7 @@ classdef j2k_tile_part_header < handle
             if strcmp(uEPH, 'yes')
                 use_EPH = true;
             end
-            
+
             ycc = obj.ycc;
             cobj = obj;
             while isempty(ycc)
@@ -122,7 +124,7 @@ classdef j2k_tile_part_header < handle
             if strcmp(ycc, 'yes')
                 use_YCbCr_trafo = 1;
             end
-            
+
             nlayers = obj.layers;
             cobj = obj;
             while isempty(nlayers)
@@ -133,7 +135,7 @@ classdef j2k_tile_part_header < handle
                 nlayers = p.layers;
                 cobj = p;
             end
-            
+
             norder = obj.order;
             cobj = obj;
             while isempty(norder)
@@ -144,7 +146,7 @@ classdef j2k_tile_part_header < handle
                 norder = p.order;
                 cobj = p;
             end
-            
+
             NL = obj.levels;
             cobj = obj;
             while isempty(NL)
@@ -155,7 +157,7 @@ classdef j2k_tile_part_header < handle
                 NL = p.levels;
                 cobj = p;
             end
-            
+
             rev = obj.reversible;
             cobj = obj;
             while isempty(rev)
@@ -170,7 +172,7 @@ classdef j2k_tile_part_header < handle
             if strcmp(rev, 'yes') == true
                 transformation = 1;
             end
-            
+
             Cmodes = obj.Cmodes;
             cobj = obj;
             while isempty(Cmodes)
@@ -181,7 +183,7 @@ classdef j2k_tile_part_header < handle
                 Cmodes = p.Cmodes;
                 cobj = p;
             end
-            
+
             upre = obj.use_precincts;
             cobj = obj;
             while isempty(upre)
@@ -210,9 +212,10 @@ classdef j2k_tile_part_header < handle
                 PPx = log2(pre(:, 2));
                 PPy = log2(pre(:, 1));
             else
-                PPx = 15; PPy = 15;
+                PPx = 15;
+                PPy = 15;
             end
-            
+
             cblk = obj.blk;
             cobj = obj;
             while isempty(cblk)
@@ -225,16 +228,16 @@ classdef j2k_tile_part_header < handle
             end
             blk_log2_size_x = log2(cblk(:, 2));
             blk_log2_size_y = log2(cblk(:, 1));
-            
+
             pobj = inputArgs;
-            
+
             cond = (isempty(obj.layers) == false && obj.layers ~= pobj.layers) || ...
                 (isempty(obj.order) == false && obj.order ~= pobj.order) || ...
-                (isempty(obj.ycc) == false && strcmp(obj.ycc, pobj.ycc) == false )|| ...
+                (isempty(obj.ycc) == false && strcmp(obj.ycc, pobj.ycc) == false) || ...
                 (isempty(obj.use_SOP) == false && strcmp(obj.use_SOP, pobj.use_SOP) == false) || ...
                 (isempty(obj.use_EPH) == false && strcmp(obj.use_EPH, pobj.use_EPH) == false) || ...
                 (isempty(obj.use_precincts) == false && strcmp(obj.use_precincts, pobj.use_precincts) == false) || ...
-                (isempty(obj.reversible) == false && strcmp(obj.reversible, pobj.reversible) == false )|| ...
+                (isempty(obj.reversible) == false && strcmp(obj.reversible, pobj.reversible) == false) || ...
                 (isempty(obj.levels) == false && obj.levels ~= pobj.levels) || ...
                 (isempty(obj.Cmodes) == false && obj.Cmodes ~= pobj.Cmodes) || ...
                 (isempty(obj.precincts) == false && isequal(obj.precincts, pobj.precincts) == false) || ...
@@ -254,10 +257,12 @@ classdef j2k_tile_part_header < handle
                 error('ERROR: Only one COD marker segment in the main header is allowed.');
             end
         end
+
         %% QCD
         function create_QCD(inObj, inputArgs)
             obj = findobj(inputArgs.tParam, 'idx', inObj.idx);
             if isempty(obj) == false && (isempty(obj.qstep) == false || isempty(obj.guard) == false)
+
                 %% create parameter set for QCD marker segment
                 % quantization step size is derived ?
                 is_derived = false;
@@ -266,7 +271,7 @@ classdef j2k_tile_part_header < handle
                 else
                     NL = obj.levels;
                 end
-                
+
                 if isempty(obj.reversible)
                     tObj = inputArgs;
                 else
@@ -287,13 +292,13 @@ classdef j2k_tile_part_header < handle
                 else
                     use_YCbCr_trafo = 0;
                 end
-                
+
                 if isempty(obj.guard)
                     nG = inputArgs.guard;
                 else
                     nG = obj.guard;
                 end
-                
+
                 if isempty(obj.qstep)
                     qs = inputArgs.qstep;
                 else
@@ -303,8 +308,8 @@ classdef j2k_tile_part_header < handle
                 if transformation == 1
                     % lossless
                     BIBO_gain = get_BIBO_gain(NL, transformation);
-                    exponent = zeros(1, 3*NL + 1, 'uint8');
-                    for i=1:3*NL+1
+                    exponent = zeros(1, 3 * NL + 1, 'uint8');
+                    for i = 1:3 * NL + 1
                         gain = BIBO_gain(i);
                         range = inputArgs.bitDepth - nG;
                         while gain > 0.9
@@ -320,9 +325,9 @@ classdef j2k_tile_part_header < handle
                 else
                     % lossy
                     Wb = weight_mse(NL, transformation);
-                    exponent = zeros(1, 3*NL + 1, 'uint16');
-                    mantissa = zeros(1, 3*NL + 1, 'uint16');
-                    for i=1:length(Wb)
+                    exponent = zeros(1, 3 * NL + 1, 'uint16');
+                    mantissa = zeros(1, 3 * NL + 1, 'uint16');
+                    for i = 1:length(Wb)
                         [exponent(i), mantissa(i)] = step_to_eps_mu(Wb(i), qs);
                     end
                     % set QCD marker
@@ -338,6 +343,7 @@ classdef j2k_tile_part_header < handle
                 error('ERROR: Only one QCD marker segment in the main header is allowed.');
             end
         end
+
         %% COC
         function create_COC(inObj, inputArgs, t, Csiz, main_header)
             for nc = 0:Csiz - 1
@@ -355,7 +361,7 @@ classdef j2k_tile_part_header < handle
                 NL = obj.levels;
                 cobj = obj;
                 while isempty(NL)
-                    if isa(cobj.parent, 'component_parameters') == true 
+                    if isa(cobj.parent, 'component_parameters') == true
                         p = findobj(cobj.parent, 'idx', nc);
                         if isempty(p)
                             p = inputArgs;
@@ -370,7 +376,7 @@ classdef j2k_tile_part_header < handle
                 Cmodes = obj.Cmodes;
                 cobj = obj;
                 while isempty(Cmodes)
-                    if isa(cobj.parent, 'component_parameters') == true 
+                    if isa(cobj.parent, 'component_parameters') == true
                         p = findobj(cobj.parent, 'idx', nc);
                         if isempty(p)
                             p = inputArgs;
@@ -381,12 +387,12 @@ classdef j2k_tile_part_header < handle
                     Cmodes = p.Cmodes;
                     cobj = p;
                 end
-                
+
                 % transformation
                 rev = obj.reversible;
                 cobj = obj;
                 while isempty(rev)
-                    if isa(cobj.parent, 'component_parameters') == true 
+                    if isa(cobj.parent, 'component_parameters') == true
                         p = findobj(cobj.parent, 'idx', nc);
                         if isempty(p)
                             p = inputArgs;
@@ -401,12 +407,12 @@ classdef j2k_tile_part_header < handle
                 if strcmp(rev, 'yes') == true
                     transformation = 1;
                 end
-                
+
                 % precincts
                 upre = obj.use_precincts;
                 cobj = obj;
                 while isempty(upre)
-                    if isa(cobj.parent, 'component_parameters') == true 
+                    if isa(cobj.parent, 'component_parameters') == true
                         p = findobj(cobj.parent, 'idx', nc);
                         if isempty(p)
                             p = inputArgs;
@@ -425,7 +431,7 @@ classdef j2k_tile_part_header < handle
                     pre = obj.precincts;
                     cobj = obj;
                     while isempty(pre)
-                        if isa(cobj.parent, 'component_parameters') == true 
+                        if isa(cobj.parent, 'component_parameters') == true
                             p = findobj(cobj.parent, 'idx', nc);
                             if isempty(p)
                                 p = inputArgs;
@@ -439,14 +445,15 @@ classdef j2k_tile_part_header < handle
                     PPx = log2(pre(:, 2));
                     PPy = log2(pre(:, 1));
                 else
-                    PPx = 15; PPy = 15;
+                    PPx = 15;
+                    PPy = 15;
                 end
-                
+
                 % codeblock size
                 cblk = obj.blk;
                 cobj = obj;
                 while isempty(cblk)
-                    if isa(cobj.parent, 'component_parameters') == true 
+                    if isa(cobj.parent, 'component_parameters') == true
                         p = findobj(cobj.parent, 'idx', nc);
                         if isempty(p)
                             p = inputArgs;
@@ -459,8 +466,8 @@ classdef j2k_tile_part_header < handle
                 end
                 blk_log2_size_x = log2(cblk(:, 2));
                 blk_log2_size_y = log2(cblk(:, 1));
-                
-                
+
+
                 % set COC marker
                 tmpCOC = COC_marker(Csiz, nc, is_maximum_precincts, NL, ...
                     blk_log2_size_x - 2, blk_log2_size_y - 2, Cmodes, transformation, PPx, PPy);
@@ -470,14 +477,14 @@ classdef j2k_tile_part_header < handle
                             pobj.get_transformation() ~= transformation || ...
                             isequal(pobj.get_codeblock_size_in_exponent(), log2(cblk)) == false || ...
                             pobj.get_codeblock_style() ~= Cmodes || ...
-                            pobj.is_maximum_precincts() ~= is_maximum_precincts && isequal(pobj.get_precinct_size_in_exponent(), [PPy PPx]) == false
-                        inObj.COC = [inObj.COC tmpCOC];
+                            pobj.is_maximum_precincts() ~= is_maximum_precincts && isequal(pobj.get_precinct_size_in_exponent(), [PPy, PPx]) == false
+                        inObj.COC = [inObj.COC, tmpCOC];
                     end
                 else
                     pobj = findobj(main_header.COC, 'Ccoc', nc);
                     if isempty(pobj) == false
                         if isequal(pobj, tmpCOC) == false
-                            inObj.COC = [inObj.COC tmpCOC];
+                            inObj.COC = [inObj.COC, tmpCOC];
                         end
                     else
                         pobj = findobj(main_header.COD);
@@ -485,14 +492,15 @@ classdef j2k_tile_part_header < handle
                                 pobj.get_transformation() ~= transformation || ...
                                 isequal(pobj.get_codeblock_size_in_exponent(), log2(cblk)) == false || ...
                                 pobj.get_codeblock_style() ~= Cmodes || ...
-                                pobj.is_maximum_precincts() ~= is_maximum_precincts && isequal(pobj.get_precinct_size_in_exponent(), [PPy PPx]) == false
-                            inObj.COC = [inObj.COC tmpCOC];
+                                pobj.is_maximum_precincts() ~= is_maximum_precincts && isequal(pobj.get_precinct_size_in_exponent(), [PPy, PPx]) == false
+                            inObj.COC = [inObj.COC, tmpCOC];
                         end
                     end
                 end
             end
-            
+
         end
+
         %% QCC
         function create_QCC(inObj, inputArgs, t, Csiz, main_header)
             for nc = 0:Csiz - 1
@@ -506,11 +514,11 @@ classdef j2k_tile_part_header < handle
                 if isempty(obj)
                     continue;
                 end
-                
+
                 NL = obj.levels;
                 cobj = obj;
                 while isempty(NL)
-                    if isa(cobj.parent, 'component_parameters') == true 
+                    if isa(cobj.parent, 'component_parameters') == true
                         p = findobj(cobj.parent, 'idx', nc);
                         if isempty(p)
                             p = inputArgs;
@@ -521,11 +529,11 @@ classdef j2k_tile_part_header < handle
                     NL = p.levels;
                     cobj = p;
                 end
-                
+
                 rev = obj.reversible;
                 cobj = obj;
                 while isempty(rev)
-                    if isa(cobj.parent, 'component_parameters') == true 
+                    if isa(cobj.parent, 'component_parameters') == true
                         p = findobj(cobj.parent, 'idx', nc);
                         if isempty(p)
                             p = inputArgs;
@@ -540,11 +548,11 @@ classdef j2k_tile_part_header < handle
                 if strcmp(rev, 'yes') == true
                     transformation = 1;
                 end
-                
+
                 nG = obj.guard;
                 cobj = obj;
                 while isempty(nG)
-                    if isa(cobj.parent, 'component_parameters') == true 
+                    if isa(cobj.parent, 'component_parameters') == true
                         p = findobj(cobj.parent, 'idx', nc);
                         if isempty(p)
                             p = inputArgs;
@@ -555,11 +563,11 @@ classdef j2k_tile_part_header < handle
                     nG = p.guard;
                     cobj = p;
                 end
-                
+
                 qs = obj.qstep;
                 cobj = obj;
                 while isempty(qs)
-                    if isa(cobj.parent, 'component_parameters') == true 
+                    if isa(cobj.parent, 'component_parameters') == true
                         p = findobj(cobj.parent, 'idx', nc);
                         if isempty(p)
                             p = inputArgs;
@@ -570,7 +578,7 @@ classdef j2k_tile_part_header < handle
                     qs = p.qstep;
                     cobj = p;
                 end
-                
+
                 pobj = findobj(inputArgs.tParam, 'idx', t);
                 if isempty(pobj) == false
                     ycc = pobj.ycc;
@@ -589,17 +597,17 @@ classdef j2k_tile_part_header < handle
                 if strcmp(ycc, 'yes') == true
                     use_YCbCr_trafo = 1;
                 end
-                
+
                 %% create parameter set for QCC marker segment
                 % quantization step size is derived ?
                 is_derived = false;
-                
+
                 % set exponent and mantissa for step size
                 if transformation == 1
                     % lossless
                     BIBO_gain = get_BIBO_gain(NL, transformation);
-                    exponent = zeros(1, 3*NL + 1, 'uint8');
-                    for i=1:3*NL+1
+                    exponent = zeros(1, 3 * NL + 1, 'uint8');
+                    for i = 1:3 * NL + 1
                         gain = BIBO_gain(i);
                         range = inputArgs.bitDepth - nG;
                         while gain > 0.9
@@ -615,9 +623,9 @@ classdef j2k_tile_part_header < handle
                 else
                     % lossy
                     Wb = weight_mse(NL, transformation);
-                    exponent = zeros(1, 3*NL + 1, 'uint16');
-                    mantissa = zeros(1, 3*NL + 1, 'uint16');
-                    for i=1:length(Wb)
+                    exponent = zeros(1, 3 * NL + 1, 'uint16');
+                    mantissa = zeros(1, 3 * NL + 1, 'uint16');
+                    for i = 1:length(Wb)
                         [exponent(i), mantissa(i)] = step_to_eps_mu(Wb(i), qs);
                     end
                     % set QCC marker
@@ -626,18 +634,18 @@ classdef j2k_tile_part_header < handle
                 pobj = inObj.QCD;
                 if isempty(pobj) == false
                     if isequal(pobj.Sqcd, tmpQCC.Sqcc) == false || isequal(pobj.SPqcd, tmpQCC.SPqcc) == false
-                        inObj.QCC = [inObj.QCC tmpQCC];
+                        inObj.QCC = [inObj.QCC, tmpQCC];
                     end
                 else
                     pobj = findobj(main_header.QCC, 'Cqcc', nc);
                     if isempty(pobj) == false
                         if isequal(pobj, tmpQCC) == false
-                            inObj.QCC = [inObj.QCC tmpQCC];
+                            inObj.QCC = [inObj.QCC, tmpQCC];
                         end
                     else
                         pobj = findobj(main_header.QCD);
                         if isequal(pobj.Sqcd, tmpQCC.Sqcc) == false || isequal(pobj.SPqcd, tmpQCC.SPqcc) == false
-                            inObj.QCC = [inObj.QCC tmpQCC];
+                            inObj.QCC = [inObj.QCC, tmpQCC];
                         end
                     end
                 end
@@ -648,23 +656,23 @@ classdef j2k_tile_part_header < handle
             if isempty(obj) == true || isempty(obj.tilepart_POC) == true
                 return;
             end
-            
+
             if obj.tilepart_POC.check(inObj, main_header) == false
                 error('ERROR: Supplied progression order attributes are insuffient to cover all packets for the tile.');
             end
             inObj.POC = obj.tilepart_POC;
             n = inObj.POC.number_progression_order_change;
             if main_header.SIZ.Csiz < 257
-                inObj.POC.Lpoc = 2 + 7*n;
+                inObj.POC.Lpoc = 2 + 7 * n;
             else
-                inObj.POC.Lpoc = 2 + 9*n;
+                inObj.POC.Lpoc = 2 + 9 * n;
             end
         end
         function read_COC(inObj, hDsrc, Csiz)
             if isempty(inObj.COC) == true
                 inObj.COC = COC_marker;
             else
-                inObj.COC = [inObj.COC COC_marker];
+                inObj.COC = [inObj.COC, COC_marker];
             end
             inObj.COC(end).read_COC(hDsrc, Csiz);
         end
@@ -672,7 +680,7 @@ classdef j2k_tile_part_header < handle
             if isempty(inObj.QCC) == true
                 inObj.QCC = QCC_marker;
             else
-                inObj.QCC = [inObj.QCC QCC_marker];
+                inObj.QCC = [inObj.QCC, QCC_marker];
             end
             inObj.QCC(end).read_QCC(hDsrc, Csiz);
         end
@@ -680,7 +688,7 @@ classdef j2k_tile_part_header < handle
             if isempty(inObj.RGN) == true
                 inObj.RGN = RGN_marker;
             else
-                inObj.RGN = [inObj.RGN RGN_marker];
+                inObj.RGN = [inObj.RGN, RGN_marker];
             end
             inObj.RGN(end).read_RGN(hDsrc, Csiz);
         end
@@ -699,7 +707,7 @@ classdef j2k_tile_part_header < handle
             if isempty(inObj.COM) == true
                 inObj.COM = COM_marker;
             else
-                inObj.COM = [inObj.COM COM_marker];
+                inObj.COM = [inObj.COM, COM_marker];
             end
             inObj.COM(end).read_COM(hDsrc);
             if inObj.COM(end).Rcom == 1
@@ -710,7 +718,7 @@ classdef j2k_tile_part_header < handle
             if isempty(inObj.PPT) == true
                 inObj.PPT = PPT_marker;
             else
-                inObj.PPT = [inObj.PPT PPT_marker];
+                inObj.PPT = [inObj.PPT, PPT_marker];
             end
             inObj.PPT(end).read_PPT(hDsrc);
         end
@@ -718,7 +726,7 @@ classdef j2k_tile_part_header < handle
             if isempty(inObj.PLT) == true
                 inObj.PLT = PLT_marker;
             else
-                inObj.PLT = [inObj.PLT PLT_marker];
+                inObj.PLT = [inObj.PLT, PLT_marker];
             end
             inObj.PLT(end).read_PLT(hDsrc);
         end

@@ -15,8 +15,8 @@ if NL - reduce_NL > 0
         u1 = nextResolution.trx1;
         v0 = nextResolution.try0;
         v1 = nextResolution.try1;
-        nextLL = subband_info(0, u0, v0, uint32(u1-u0), uint32(v1-v0), zeros(v1-v0, u1-u0), 0, 0);
-        nextResolution.subbandInfo = [nextLL nextResolution.subbandInfo];
+        nextLL = subband_info(0, u0, v0, uint32(u1 - u0), uint32(v1 - v0), zeros(v1 - v0, u1 - u0), 0, 0);
+        nextResolution.subbandInfo = [nextLL, nextResolution.subbandInfo];
         LL = findobj(currentResolution.subbandInfo, 'idx', 0);
         HL = findobj(nextResolution.subbandInfo, 'idx', 1);
         LH = findobj(nextResolution.subbandInfo, 'idx', 2);

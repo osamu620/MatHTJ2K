@@ -6,12 +6,12 @@ classdef jp2_packet < handle
         idx_l uint16
         px uint32
         py uint32
-        header (1,:) uint8
-        body (1,:) uint8
+        header(1, :) uint8
+        body(1, :) uint8
         is_emitted logical
     end
     methods
-        function outObj = jp2_packet(c, r, l, px ,py)
+        function outObj = jp2_packet(c, r, l, px, py)
             outObj.idx_c = c;
             outObj.idx_r = r;
             outObj.idx_l = l;

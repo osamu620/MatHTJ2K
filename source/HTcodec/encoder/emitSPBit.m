@@ -8,7 +8,7 @@ state_SP_enc.SP_bits = state_SP_enc.SP_bits + 1;
 if state_SP_enc.SP_bits == state_SP_enc.SP_max
     state_SP_enc.SP_buf(state_SP_enc.SP_pos + M_OFFSET) = state_SP_enc.SP_tmp;
     state_SP_enc.SP_pos = state_SP_enc.SP_pos + 1;
-    
+
     if state_SP_enc.SP_tmp == x_FF
         state_SP_enc.SP_max = 7;
     else

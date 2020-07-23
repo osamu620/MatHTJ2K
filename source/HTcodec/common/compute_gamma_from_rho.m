@@ -5,5 +5,3 @@ if rho == 0 || rho == 1 || rho == 2 || rho == 4 || rho == 8 %ismember(rho, [0 1 
 else
     gamma = int32(1);
 end
-
-

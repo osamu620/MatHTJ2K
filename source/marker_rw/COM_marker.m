@@ -16,19 +16,19 @@ classdef COM_marker < handle
                 else
                     outObj.Rcom = 0;
                 end
-                for i=1:length(comment)
+                for i = 1:length(comment)
                     outObj.comments(i) = comment(i);
                 end
             end
         end
         function read_COM(inObj, hDsrc)
-            assert(isa(hDsrc,'jp2_data_source'));
-            assert(isa(inObj,'COM_marker'), 'input for readCOMmarker() shall be COM_marker class.');
+            assert(isa(hDsrc, 'jp2_data_source'));
+            assert(isa(inObj, 'COM_marker'), 'input for readCOMmarker() shall be COM_marker class.');
             %
             inObj.Lcom = get_word(hDsrc);
             inObj.Rcom = get_word(hDsrc);
             inObj.comments = zeros(1, inObj.Lcom - 4);
-            for i= 1:inObj.Lcom - 4
+            for i = 1:inObj.Lcom - 4
                 inObj.comments(i) = get_byte(hDsrc);
             end
             assert(inObj.Rcom < 2, 'Rcom value is incorrect.\n');
@@ -38,8 +38,8 @@ classdef COM_marker < handle
             inObj.is_read = true;
         end
         function write_COM(inObj, m, hDdst)
-            assert(isa(hDdst,'jp2_data_destination'));
-            assert(isa(inObj,'COM_marker'), 'input for write_COM() shall be COM_marker class.');
+            assert(isa(hDdst, 'jp2_data_destination'));
+            assert(isa(inObj, 'COM_marker'), 'input for write_COM() shall be COM_marker class.');
             put_word(hDdst, m.COM);
             put_word(hDdst, inObj.Lcom);
             put_word(hDdst, inObj.Rcom);

@@ -22,10 +22,10 @@ classdef jp2_boxes < handle
             inObj.signatureBox = jp2_signature_box;
             inObj.signatureBox.read_contents(inObj.hDsrc);
             assert(inObj.signatureBox.LBox == 12 && strcmp(convert_uint32_to_char(inObj.signatureBox.TBox), 'jP  '));
-            
+
             hBox = jp2_box_base;
             hBox.read_box_base(inObj.hDsrc);
-            
+
             while (inObj.hDsrc.pos <= length(inObj.hDsrc.buf))
                 switch convert_uint32_to_char(hBox.TBox)
                     case 'ftyp'
@@ -43,15 +43,15 @@ classdef jp2_boxes < handle
                         fprintf('Intellectual Property box\n');
                     case 'xml '
                         fprintf('XML box\n');
-                        inObj.XMLBox = [inObj.XMLBox xml_box(hBox)];
+                        inObj.XMLBox = [inObj.XMLBox, xml_box(hBox)];
                         inObj.XMLBox(end).read_contents();
                     case 'uuid'
                         fprintf('UUID box\n');
-                        inObj.UUIDBox = [inObj.UUIDBox uuid_box(hBox)];
+                        inObj.UUIDBox = [inObj.UUIDBox, uuid_box(hBox)];
                         inObj.UUIDBox(end).read_contents();
                     case 'uinf'
                         fprintf('UUID Info box\n');
-                        inObj.UUIDInfoBox = [inObj.UUIDInfoBox uuid_info_box(hBox)];
+                        inObj.UUIDInfoBox = [inObj.UUIDInfoBox, uuid_info_box(hBox)];
                         inObj.UUIDInfoBox(end).read_contents();
                     otherwise
                         fprintf('Unkown box found\n');

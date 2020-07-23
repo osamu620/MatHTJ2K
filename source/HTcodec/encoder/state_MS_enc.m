@@ -1,9 +1,9 @@
 classdef state_MS_enc < handle
     properties
-        MS_pos  uint32
+        MS_pos uint32
         MS_bits uint8
-        MS_max  uint8
-        MS_tmp  uint8
+        MS_max uint8
+        MS_tmp uint8
     end
     methods
         function outObj = state_MS_enc

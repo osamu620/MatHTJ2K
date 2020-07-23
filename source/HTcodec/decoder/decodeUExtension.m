@@ -6,7 +6,7 @@ if u_sfx < 28
 end
 
 val = importVLCBit(Dcup, Pcup, Lcup, state_VLC_dec);
-for i=1:4-1
+for i = 1:4 - 1
     bit = importVLCBit(Dcup, Pcup, Lcup, state_VLC_dec);
     val = val + bitshift(bit, i);
 end

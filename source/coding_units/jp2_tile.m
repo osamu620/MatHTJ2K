@@ -34,7 +34,7 @@ classdef jp2_tile < handle
                 outObj.is_read = false;
             else
                 outObj.SOT = SOT_marker;
-                outObj.idx = p + q* numtile_wide;
+                outObj.idx = p + q * numtile_wide;
                 outObj.idx_x = p;
                 outObj.idx_y = q;
                 outObj.tile_pos_x = tx0;
@@ -59,11 +59,11 @@ classdef jp2_tile < handle
                 [~, codingStyleComponent] = get_coding_Styles(main_header, inObj.header, c);
                 c_NL = codingStyleComponent.get_number_of_decomposition_levels();
                 reduced_LL = findobj(inObj.resolution, 'idx', c_NL - reduce_NL, '-and', 'idx_c', c);
-                
+
                 c_ty0(c + M_OFFSET) = reduced_LL.try0;
                 c_ty1(c + M_OFFSET) = reduced_LL.try1;
                 c_tx0(c + M_OFFSET) = reduced_LL.trx0;
-                c_tx1(c + M_OFFSET )= reduced_LL.trx1;
+                c_tx1(c + M_OFFSET) = reduced_LL.trx1;
             end
             ty0 = max(c_ty0);
             ty1 = max(c_ty1);
@@ -74,17 +74,17 @@ classdef jp2_tile < handle
         end
         function out = put_tile_into_output(inObj, main_header, out, reduce_NL)
             M_OFFSET = 1;
-  
+
             for c = 0:main_header.SIZ.Csiz - 1
                 [~, codingStyleComponent] = get_coding_Styles(main_header, inObj.header, c);
                 c_NL = codingStyleComponent.get_number_of_decomposition_levels();
                 reduced_LL = findobj(inObj.resolution, 'idx', c_NL - reduce_NL, '-and', 'idx_c', c);
-                
+
                 tcy0 = reduced_LL.try0;
                 tcy1 = reduced_LL.try1;
                 tcx0 = reduced_LL.trx0;
                 tcx1 = reduced_LL.trx1;
-                out{c + M_OFFSET}(tcy0 + M_OFFSET:tcy1, tcx0 + M_OFFSET:tcx1) = inObj.output{c + M_OFFSET};
+                out{c+M_OFFSET}(tcy0 + M_OFFSET:tcy1, tcx0 + M_OFFSET:tcx1) = inObj.output{c+M_OFFSET};
             end
         end
     end

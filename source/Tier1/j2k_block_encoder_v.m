@@ -5,16 +5,16 @@ M_OFFSET = 1;
 hCodeblock = codeblock_body(vCodeblock);
 
 % retrieve codeblock style from COD marker
-CB_BYPASS  = bitand(hCodeblock.Cmodes , 1);
+CB_BYPASS = bitand(hCodeblock.Cmodes, 1);
 %CB_RESET   = bitshift(bitand(hCodeblock.Cmodes , 2), -1); % this flag is processed in each pass
-CB_RESTART = bitshift(bitand(hCodeblock.Cmodes , 4), -2);
-CB_CAUSAL  = bitshift(bitand(hCodeblock.Cmodes , 8), -3);
-CB_ERTERM  = bitshift(bitand(hCodeblock.Cmodes ,16), -4);
+CB_RESTART = bitshift(bitand(hCodeblock.Cmodes, 4), -2);
+CB_CAUSAL = bitshift(bitand(hCodeblock.Cmodes, 8), -3);
+CB_ERTERM = bitshift(bitand(hCodeblock.Cmodes, 16), -4);
 %CB_SEGMARK = bitshift(bitand(hCodeblock.Cmodes ,32), -5); % this flag is processed in cleanup pass
 %label_uni = 18; % uniform, for SEGMARK
 
-states_EBCOT = ebcot_states(hCodeblock.size_x, hCodeblock.size_y);% hCodeblock.states_EBCOT;
-values_EBCOT = ebcot_elements(hCodeblock.size_x, hCodeblock.size_y);% shCodeblock.values_EBCOT;
+states_EBCOT = ebcot_states(hCodeblock.size_x, hCodeblock.size_y); % hCodeblock.states_EBCOT;
+values_EBCOT = ebcot_elements(hCodeblock.size_x, hCodeblock.size_y); % shCodeblock.values_EBCOT;
 states_EBCOT.is_causal = CB_CAUSAL;
 
 s = sign(hCodeblock.quantized_coeffs);
@@ -38,8 +38,9 @@ for i = hCodeblock.num_ZBP:-1:1
 end
 dist = 0.0;
 if hCodeblock.num_passes > 0
+
     %% Encoding passes
-    for p = int32(K-1):-1:0
+    for p = int32(K - 1):-1:0
         values_EBCOT.bitplane = bitand(values_EBCOT.magnitude_array, 2^int32(p)) / 2^int32(p);
         is_bypass_segment = false;
         if p < K - 1
@@ -60,12 +61,12 @@ if hCodeblock.num_passes > 0
                 hCodeblock.distortion_changes(hCodeblock.pass_idx) = pass_wmse_scale * dist;
             end
         end
-        
+
         % cleanup pass
         dist = encode_j2k_cleanup_pass(sig_LUT, hCodeblock, p, states_EBCOT, values_EBCOT, mq_reg_enc, is_bypass_segment);
         hCodeblock.distortion_changes(hCodeblock.pass_idx) = pass_wmse_scale * dist;
-        % if the end of the initial sucessive AC segments, we need to terminate and to know the length of each coding pass. 
-        if CB_BYPASS == true && CB_RESTART == false && p == K - 4 
+        % if the end of the initial sucessive AC segments, we need to terminate and to know the length of each coding pass.
+        if CB_BYPASS == true && CB_RESTART == false && p == K - 4
             mq_reg_enc.terminate_segment(hCodeblock, hCodeblock.pass_idx);
             mq_reg_enc.buf_next = mq_reg_enc.buf_next + 1; % Plus 1 is because every first byte in an arithmetic codeword segment is skipped.
             mq_reg_enc.L = mq_reg_enc.buf_next;
@@ -74,21 +75,22 @@ if hCodeblock.num_passes > 0
         % move to next bitplane..
         pass_wmse_scale = pass_wmse_scale * 0.25;
     end
-    
+
     %% temporal termination
     if CB_RESTART == false && CB_BYPASS == false
         mq_reg_enc.terminate_segment(hCodeblock, hCodeblock.num_passes);
     end
+
     %% construct compressed byte buffer from terminated MQ or RAW segments
     buf = zeros(1, sum(hCodeblock.pass_length), 'uint8');
     buf = construct_compressed_data(buf, hCodeblock, mq_reg_enc);
     hCodeblock.compressed_data = buf;
     hCodeblock.length = length(hCodeblock.compressed_data);
-    
+
     %% find convex hull
     find_feasible_truncation_points(hCodeblock);
 else
-    hCodeblock.compressed_data = uint8(0);%dummy
+    hCodeblock.compressed_data = uint8(0); %dummy
     hCodeblock.length = 0;
 end
 out_vCodeblock = v_codeblock_body(hCodeblock);

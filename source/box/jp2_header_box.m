@@ -16,7 +16,7 @@ classdef jp2_header_box < jp2_box_base
             tmpTBox = get_dword(inObj.DBox);
             assert(strcmp(convert_uint32_to_char(tmpTBox), 'ihdr'));
             inObj.ihdr = image_header_box(inObj);
-            
+
             inObj.ihdr.read_contents();
             while inObj.DBox.pos < length(inObj.DBox.buf)
                 hBox = jp2_box_base;
@@ -28,7 +28,7 @@ classdef jp2_header_box < jp2_box_base
                         inObj.bpcc.read_contents();
                     case 'colr'
                         fprintf('Colour Specification box\n');
-                        inObj.colr = [inObj.colr colour_specification_box(hBox)];
+                        inObj.colr = [inObj.colr, colour_specification_box(hBox)];
                         inObj.colr(end).read_contents();
                     case 'pclr'
                         fprintf('Palette box\n');

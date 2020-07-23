@@ -1,16 +1,16 @@
 classdef SIZ_marker < handle
     properties
-        Lsiz  uint16
-        Rsiz  uint16
-        Xsiz  uint32
-        Ysiz  uint32
-        XOsiz  uint32
-        YOsiz  uint32
-        XTsiz  uint32
-        YTsiz  uint32
-        XTOsiz  uint32
-        YTOsiz  uint32
-        Csiz  uint16
+        Lsiz uint16
+        Rsiz uint16
+        Xsiz uint32
+        Ysiz uint32
+        XOsiz uint32
+        YOsiz uint32
+        XTsiz uint32
+        YTsiz uint32
+        XTOsiz uint32
+        YTOsiz uint32
+        Csiz uint16
         Ssiz uint8
         XRsiz uint8
         YRsiz uint8
@@ -42,7 +42,7 @@ classdef SIZ_marker < handle
                 else
                     R = 0;
                 end
-                outObj.Lsiz = 38 + 3*C;
+                outObj.Lsiz = 38 + 3 * C;
                 outObj.Rsiz = R;
                 outObj.Xsiz = X;
                 outObj.Ysiz = Y;
@@ -63,7 +63,7 @@ classdef SIZ_marker < handle
                     outObj.XRsiz(i) = XR(i);
                     outObj.YRsiz(i) = YR(i);
                 end
-                
+
                 outObj.needCAP = needCAP;
                 outObj.is_read = false;
             end
@@ -81,8 +81,8 @@ classdef SIZ_marker < handle
             end
         end
         function read_SIZ(inObj, hDsrc)
-            assert(isa(hDsrc,'jp2_data_source'));
-            assert(isa(inObj,'SIZ_marker'), 'input for read_SIZ() shall be SIZ_marker class.');
+            assert(isa(hDsrc, 'jp2_data_source'));
+            assert(isa(inObj, 'SIZ_marker'), 'input for read_SIZ() shall be SIZ_marker class.');
             %
             inObj.Lsiz = get_word(hDsrc);
             inObj.Rsiz = get_word(hDsrc);
@@ -103,8 +103,8 @@ classdef SIZ_marker < handle
             inObj.XTOsiz = get_dword(hDsrc);
             inObj.YTOsiz = get_dword(hDsrc);
             inObj.Csiz = get_word(hDsrc);
-            assert(inObj.Csiz == (inObj.Lsiz -38)/3, 'Lsiz and/or Csiz are incorrect.\n');
-            for iComponent=1:inObj.Csiz
+            assert(inObj.Csiz == (inObj.Lsiz - 38) / 3, 'Lsiz and/or Csiz are incorrect.\n');
+            for iComponent = 1:inObj.Csiz
                 inObj.Ssiz(iComponent) = get_byte(hDsrc);
                 inObj.XRsiz(iComponent) = get_byte(hDsrc);
                 inObj.YRsiz(iComponent) = get_byte(hDsrc);
@@ -119,9 +119,9 @@ classdef SIZ_marker < handle
             inObj.is_read = true;
         end
         function write_SIZ(inObj, m, hDdst)
-            assert(isa(hDdst,'jp2_data_destination'));
-            assert(isa(inObj,'SIZ_marker'), 'input for write_SIZ() shall be SIZ_marker class.');
-            assert(inObj.Lsiz == 38 + 3*inObj.Csiz);
+            assert(isa(hDdst, 'jp2_data_destination'));
+            assert(isa(inObj, 'SIZ_marker'), 'input for write_SIZ() shall be SIZ_marker class.');
+            assert(inObj.Lsiz == 38 + 3 * inObj.Csiz);
             put_word(hDdst, m.SIZ);
             put_word(hDdst, inObj.Lsiz);
             put_word(hDdst, inObj.Rsiz);
@@ -134,7 +134,7 @@ classdef SIZ_marker < handle
             put_dword(hDdst, inObj.XTOsiz);
             put_dword(hDdst, inObj.YTOsiz);
             put_word(hDdst, inObj.Csiz);
-            for i=1:inObj.Csiz
+            for i = 1:inObj.Csiz
                 put_byte(hDdst, inObj.Ssiz(i));
                 put_byte(hDdst, inObj.XRsiz(i));
                 put_byte(hDdst, inObj.YRsiz(i));

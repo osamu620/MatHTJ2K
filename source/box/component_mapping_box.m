@@ -13,7 +13,7 @@ classdef component_mapping_box < jp2_box_base
                 inObj.MTYP_i(i) = get_byte(inObj.DBox);
                 inObj.PCOL_i(i) = get_byte(inObj.DBox);
                 num_bytes = num_bytes + 4;
-                i = i +1;
+                i = i + 1;
             end
             inObj.is_read = true;
         end

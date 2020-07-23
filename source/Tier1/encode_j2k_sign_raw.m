@@ -7,4 +7,3 @@ if s >= 0
 else
     h_mq_enc.emit_raw_symbol(1);
 end
-

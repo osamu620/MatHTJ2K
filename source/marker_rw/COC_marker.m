@@ -25,13 +25,13 @@ classdef COC_marker < handle
                     outObj.Lcoc = outObj.Lcoc + 1;
                     outObj.Lcoc = outObj.Lcoc + number_of_decomposition_levels;
                 end
-                
+
                 % Scoc
                 outObj.Scoc = 0;
                 if is_maximum_precincts == false
                     outObj.Scoc = outObj.Scoc + 1;
                 end
-                
+
                 % SPcoc parameters
                 outObj.SPcoc(1) = number_of_decomposition_levels;
                 assert(codeblock_width_exponent >= 0 && codeblock_width_exponent <= 8);
@@ -39,25 +39,25 @@ classdef COC_marker < handle
                 assert(codeblock_width_exponent + codeblock_height_exponent <= 10);
                 outObj.SPcoc(2) = codeblock_width_exponent;
                 outObj.SPcoc(3) = codeblock_height_exponent;
-                
-                
+
+
                 outObj.SPcoc(4) = codeblock_style;
-                
+
                 outObj.SPcoc(5) = transformation;
-                
+
                 M_OFFSET = 1;
                 if is_maximum_precincts == false
-                    for i=0:number_of_decomposition_levels
-                        if length(PPx) >= (i+M_OFFSET)
-                            lastPPx = PPx(i+M_OFFSET);
+                    for i = 0:number_of_decomposition_levels
+                        if length(PPx) >= (i + M_OFFSET)
+                            lastPPx = PPx(i + M_OFFSET);
                         end
-                        if length(PPx) >= (i+M_OFFSET)
-                            lastPPy = PPy(i+M_OFFSET);
+                        if length(PPx) >= (i + M_OFFSET)
+                            lastPPy = PPy(i + M_OFFSET);
                         end
-                        outObj.SPcoc(6+number_of_decomposition_levels-i) = lastPPx + 16*lastPPy;
+                        outObj.SPcoc(6 + number_of_decomposition_levels - i) = lastPPx + 16 * lastPPy;
                     end
                 end
-                
+
             end
         end
         function out = is_maximum_precincts(inObj)
@@ -134,20 +134,20 @@ classdef COC_marker < handle
             out = zeros(NL + 1, 2);
             for i = 0:NL
                 if is_maximum_precincts(inObj) == false
-                    out(i+M_OFFSET,1) = bitand(inObj.SPcoc(6+i), x_0F); % PPx
-                    out(i+M_OFFSET,2) = bitshift(bitand(inObj.SPcoc(6+i), x_F0), -4); % PPy
+                    out(i + M_OFFSET, 1) = bitand(inObj.SPcoc(6 + i), x_0F); % PPx
+                    out(i + M_OFFSET, 2) = bitshift(bitand(inObj.SPcoc(6 + i), x_F0), -4); % PPy
                 else
-                    out(i+M_OFFSET,1) = 15;% maximum_precincts
-                    out(i+M_OFFSET,2) = 15;% maximum_precincts
+                    out(i + M_OFFSET, 1) = 15; % maximum_precincts
+                    out(i + M_OFFSET, 2) = 15; % maximum_precincts
                 end
             end
         end
         function read_COC(inObj, hDsrc, Csiz)
-            assert(isa(hDsrc,'jp2_data_source'));
-            assert(isa(inObj,'COC_marker'), 'input for read_COC() shall be COC_marker class.');
+            assert(isa(hDsrc, 'jp2_data_source'));
+            assert(isa(inObj, 'COC_marker'), 'input for read_COC() shall be COC_marker class.');
             % Lcoc
             inObj.Lcoc = get_word(hDsrc);
-            assert(inObj.Lcoc >=9 && inObj.Lcoc <= 43);
+            assert(inObj.Lcoc >= 9 && inObj.Lcoc <= 43);
             % Ccoc
             Lcoc_base = 9;
             if Csiz < 257
@@ -158,31 +158,31 @@ classdef COC_marker < handle
             end
             % Scoc
             inObj.Scoc = get_byte(hDsrc);
-           
+
             % SPcoc parameters
             inObj.SPcoc(1) = get_byte(hDsrc);
-            
+
             if inObj.is_maximum_precincts() == false
                 Lcoc_base = Lcoc_base + 1;
                 assert(inObj.Lcoc == Lcoc_base + get_number_of_decomposition_levels(inObj), 'Lcoc is incorrect.');
             else
                 assert(inObj.Lcoc == Lcoc_base, 'Lcoc is incorrect.');
             end
-            
+
             inObj.SPcoc(2) = get_byte(hDsrc);
             inObj.SPcoc(3) = get_byte(hDsrc);
             inObj.SPcoc(4) = get_byte(hDsrc);
             inObj.SPcoc(5) = get_byte(hDsrc);
             if is_maximum_precincts(inObj) == false
-                for i=0:get_number_of_decomposition_levels(inObj)
-                    inObj.SPcoc(6+i) = get_byte(hDsrc);
+                for i = 0:get_number_of_decomposition_levels(inObj)
+                    inObj.SPcoc(6 + i) = get_byte(hDsrc);
                 end
             end
             inObj.is_read = true;
         end
         function write_COC(inObj, m, hDdst, Csiz)
-            assert(isa(hDdst,'jp2_data_destination'));
-            assert(isa(inObj,'COC_marker'), 'input for wirte_COC() shall be COC_marker class.');
+            assert(isa(hDdst, 'jp2_data_destination'));
+            assert(isa(inObj, 'COC_marker'), 'input for wirte_COC() shall be COC_marker class.');
             put_word(hDdst, m.COC);
             NL = inObj.get_number_of_decomposition_levels();
             if inObj.is_maximum_precincts() == true
@@ -212,7 +212,7 @@ classdef COC_marker < handle
         end
         function copy_from_COD(inObj, idx_c, hCOD)
             inObj.Ccoc = uint16(idx_c);
-            inObj.Scoc = bitand(hCOD.Scod, 1);% only precinct size
+            inObj.Scoc = bitand(hCOD.Scod, 1); % only precinct size
             inObj.SPcoc = hCOD.SPcod;
         end
         function fix_params(inObj, Csiz)
@@ -224,7 +224,7 @@ classdef COC_marker < handle
                     inObj.Lcoc = 10;
                 end
             else
-                inObj.SPcoc = inObj.SPcoc(1:6+NL);
+                inObj.SPcoc = inObj.SPcoc(1:6 + NL);
                 if Csiz < 257
                     inObj.Lcoc = 10 + NL;
                 else

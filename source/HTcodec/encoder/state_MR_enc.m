@@ -1,7 +1,7 @@
 classdef state_MR_enc < handle
     properties
         MR_pos uint32
-        MR_bits uint8 
+        MR_bits uint8
         MR_tmp uint8
         MR_last uint8
         MR_buf uint8

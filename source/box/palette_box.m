@@ -15,11 +15,11 @@ classdef palette_box < jp2_box_base
             for i = 1:inObj.NE
                 for j = 1:inObj.NPC
                     if inObj.B_i(j) > 16
-                        inObj.C_ji(i,j) = get_dword(inObj.DBox);
+                        inObj.C_ji(i, j) = get_dword(inObj.DBox);
                     elseif inObj.B_i(j) > 8
-                        inObj.C_ji(i,j) = get_word(inObj.DBox);
+                        inObj.C_ji(i, j) = get_word(inObj.DBox);
                     else
-                        inObj.C_ji(i,j) = get_byte(inObj.DBox);
+                        inObj.C_ji(i, j) = get_byte(inObj.DBox);
                     end
                 end
             end

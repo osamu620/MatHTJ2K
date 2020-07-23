@@ -2,9 +2,11 @@ function PPM_header = read_main_header(hDsrc, JP2markers, main_header)
 M_OFFSET = 1;
 
 DEBUG = 1;
+
 %% check SOC marker
 WORD = hDsrc.get_word();
 assert(WORD == JP2markers.SOC, 'ERROR: input file is not j2c\n');
+
 %% check SIZ marker
 WORD = hDsrc.get_word();
 assert(WORD == JP2markers.SIZ, 'ERROR: SIZ marker shall be present as the second marker segment.\n');
@@ -74,11 +76,11 @@ for c = 0:main_header.SIZ.Csiz - 1
     component_height(c + M_OFFSET) = y1(c + M_OFFSET) - y0(c + M_OFFSET);
     if DEBUG == 1
         fprintf('Component #%3d, (width, height) = (%d, %d), subsampling (%d, %d)\n', ...
-            c, component_width(c + M_OFFSET), component_height(c + M_OFFSET),...
+            c, component_width(c + M_OFFSET), component_height(c + M_OFFSET), ...
             main_header.SIZ.XRsiz(c + M_OFFSET), main_header.SIZ.YRsiz(c + M_OFFSET));
     end
-    assert(0<=main_header.SIZ.XTOsiz && main_header.SIZ.XTOsiz <= main_header.SIZ.XOsiz, 'ERROR: Tile width is incorrect.\n');
-    assert(0<=main_header.SIZ.YTOsiz && main_header.SIZ.YTOsiz <= main_header.SIZ.YOsiz, 'ERROR: Tile height is incorrect.\n');
+    assert(0 <= main_header.SIZ.XTOsiz && main_header.SIZ.XTOsiz <= main_header.SIZ.XOsiz, 'ERROR: Tile width is incorrect.\n');
+    assert(0 <= main_header.SIZ.YTOsiz && main_header.SIZ.YTOsiz <= main_header.SIZ.YOsiz, 'ERROR: Tile height is incorrect.\n');
     assert((main_header.SIZ.XTsiz + main_header.SIZ.XTOsiz) > main_header.SIZ.XOsiz, 'ERROR: Tile size plus tile offset shall be greater than the image area offset.');
     assert((main_header.SIZ.YTsiz + main_header.SIZ.YTOsiz) > main_header.SIZ.YOsiz, 'ERROR: Tile size plus tile offset shall be greater than the image area offset.');
 end
@@ -96,7 +98,7 @@ if isempty(main_header.PPM) == false
     while len > pos
         N = 0;
         for i = 0:3
-            N = 256*N + int32(buf(pos + M_OFFSET));
+            N = 256 * N + int32(buf(pos + M_OFFSET));
             pos = pos + 1;
         end
         header = [header, buf(pos + M_OFFSET:pos + N)];

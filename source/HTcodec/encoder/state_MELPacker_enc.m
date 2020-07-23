@@ -1,8 +1,8 @@
 classdef state_MELPacker_enc < handle
     properties
-        MEL_pos  uint32
-        MEL_rem  uint8
-        MEL_tmp  uint8
+        MEL_pos uint32
+        MEL_rem uint8
+        MEL_tmp uint8
     end
     methods
         function outObj = state_MELPacker_enc

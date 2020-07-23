@@ -21,7 +21,7 @@ classdef bits_per_component_box < jp2_box_base
             end
         end
         function write_contents(inObj, hDdst)
-            assert(isa(hDdst,'jp2_data_destination'));
+            assert(isa(hDdst, 'jp2_data_destination'));
             inObj.write_box_base(hDdst);
             for i = 1:length(inObj.BPC)
                 hDdst.put_byte(inObj.BPC(i));

@@ -5,7 +5,7 @@ b_upp = int32(modDcup(Dcup, state_VLC_dec.VLC_pos, Lcup));
 word = b_upp * int32(2)^int32(state_VLC_dec.VLC_bits) + b_low;
 cwd = bitand(word, 127);
 
-idx = cwd + context*128 + int32(1);
+idx = cwd + context * 128 + int32(1);
 len = dec_CxtVLC_table(idx, 1);
 for i = 1:len
     importVLCBit(Dcup, Pcup, Lcup, state_VLC_dec);
@@ -36,7 +36,7 @@ emb_1 = dec_CxtVLC_table(idx, 5);
 % % emb_k = val(4);
 % % emb_1 = val(5);
 % [rho, u_off, emb_k, emb_1] = get_match(val);
-%  
+%
 %     function val = test_match(t, c, w, lw)
 %         tmp0 = t(t(:,1)==c,:);
 %         tmp1 = tmp0(tmp0(:,6) == w, :);
@@ -47,7 +47,7 @@ emb_1 = dec_CxtVLC_table(idx, 5);
 %             val = [];
 %         end
 %     end
-% 
+%
 %     function [rho, u_off, emb_k, emb_1] = get_match(t, c, w, lw)
 %         tmp0 = t(t(:,1)==c,:);
 %         tmp1 = tmp0(tmp0(:,6) == w, :);
@@ -58,5 +58,3 @@ emb_1 = dec_CxtVLC_table(idx, 5);
 %         emb_1 = tmp2(5);
 %     end
 end
-
-

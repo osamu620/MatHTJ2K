@@ -14,7 +14,7 @@ classdef j2k_main_header < handle
         PPM PPM_marker
         CPF CPF_marker
         PRF PRF_marker
-        Cap15_b14_15 (1,1) int8 = -1 
+        Cap15_b14_15(1, 1) int8 = -1
         Cap15_b13 logical
         Cap15_b12 logical
         Cap15_b11 logical
@@ -35,30 +35,30 @@ classdef j2k_main_header < handle
             if strcmp(inputArgs.use_TLM, 'yes')
                 use_TLM = true;
             end
-            
+
             flag_CAP = bitand(bitshift(inputArgs.Cmodes, -6), 1);
             if isempty(inputArgs.cParam) == false
                 for n = 1:length(inputArgs.cParam)
                     if isempty(inputArgs.cParam(n).Cmodes) == false
-                        flag_CAP = bitor(flag_CAP,  bitand(bitshift(inputArgs.cParam(n).Cmodes, -6), 1));
+                        flag_CAP = bitor(flag_CAP, bitand(bitshift(inputArgs.cParam(n).Cmodes, -6), 1));
                     end
                 end
             end
             if isempty(inputArgs.tParam) == false
                 for n = 1:length(inputArgs.tParam)
                     if isempty(inputArgs.tParam(n).Cmodes) == false
-                        flag_CAP = bitor(flag_CAP,  bitand(bitshift(inputArgs.tParam(n).Cmodes, -6), 1));
+                        flag_CAP = bitor(flag_CAP, bitand(bitshift(inputArgs.tParam(n).Cmodes, -6), 1));
                     end
                 end
             end
             if isempty(inputArgs.tcParam) == false
                 for n = 1:length(inputArgs.tcParam)
                     if isempty(inputArgs.tcParam(n).Cmodes) == false
-                        flag_CAP = bitor(flag_CAP,  bitand(bitshift(inputArgs.tcParam(n).Cmodes, -6), 1));
+                        flag_CAP = bitor(flag_CAP, bitand(bitshift(inputArgs.tcParam(n).Cmodes, -6), 1));
                     end
                 end
             end
-            
+
             %% create parameter set for SIZ marker segment
             is_signed = zeros(1, inputArgs.numComponents);
             Ssiz = zeros(1, inputArgs.numComponents);
@@ -66,16 +66,18 @@ classdef j2k_main_header < handle
             YRsiz = zeros(1, inputArgs.numComponents);
             for i = 1:inputArgs.numComponents
                 is_signed(i) = false;
-                Ssiz(i) = inputArgs.bitDepth-1;
+                Ssiz(i) = inputArgs.bitDepth - 1;
                 XRsiz(i) = 1; % currently, subsampling of components is not implemented.
                 YRsiz(i) = 1; % currently, subsampling of components is not implemented.
             end
             % default is all origins are aligned (0,0)
-            XOsiz = inputArgs.refgrid_origin(2); YOsiz = inputArgs.refgrid_origin(1);
-            XTOsiz = inputArgs.tile_origin(2); YTOsiz = inputArgs.tile_origin(1);
-            
+            XOsiz = inputArgs.refgrid_origin(2);
+            YOsiz = inputArgs.refgrid_origin(1);
+            XTOsiz = inputArgs.tile_origin(2);
+            YTOsiz = inputArgs.tile_origin(1);
+
             % set SIZ marker
-            inObj.SIZ = SIZ_marker(...
+            inObj.SIZ = SIZ_marker( ...
                 inputArgs.img_size_x, inputArgs.img_size_y, XOsiz, YOsiz, ...
                 inputArgs.tile(2), inputArgs.tile(1), XTOsiz, YTOsiz, ...
                 inputArgs.numComponents, Ssiz, XRsiz, YRsiz, ...
@@ -84,7 +86,7 @@ classdef j2k_main_header < handle
             % determine number of tiles
             numTiles_x = ceil_quotient_int((inputArgs.img_size_x - XTOsiz), inputArgs.tile(2), 'double');
             numTiles_y = ceil_quotient_int((inputArgs.img_size_y - YTOsiz), inputArgs.tile(1), 'double');
-            
+
             %% create parameter set for COD marker segment
             % Scod
             % is_maximum_precincts; given by input argument
@@ -128,9 +130,9 @@ classdef j2k_main_header < handle
             end
             inObj.COD = COD_marker(is_maximum_precincts, use_SOP, use_EPH ...
                 , inputArgs.order, inputArgs.layers, use_YCbCr_trafo ...
-                , inputArgs.levels, log2(inputArgs.blk(2))-2, log2(inputArgs.blk(1))-2 ...
+                , inputArgs.levels, log2(inputArgs.blk(2)) - 2, log2(inputArgs.blk(1)) - 2 ...
                 , inputArgs.Cmodes, transformation, PPx, PPy);
-            
+
             %% create parameter set for QCD marker segment
             % quantization step size is derived ?
             is_derived = false;
@@ -138,8 +140,8 @@ classdef j2k_main_header < handle
             if transformation == 1
                 % lossless
                 BIBO_gain = get_BIBO_gain(inputArgs.levels, inObj.COD.get_transformation());
-                exponent = zeros(1, 3*inputArgs.levels + 1, 'uint8');
-                for i=1:3*inputArgs.levels+1
+                exponent = zeros(1, 3 * inputArgs.levels + 1, 'uint8');
+                for i = 1:3 * inputArgs.levels + 1
                     gain = BIBO_gain(i);
                     range = inputArgs.bitDepth - inputArgs.guard;
                     while gain > 0.9
@@ -155,14 +157,14 @@ classdef j2k_main_header < handle
             else
                 % lossy
                 Wb = weight_mse(inputArgs.levels, transformation);
-                exponent = zeros(1, 3*inputArgs.levels + 1, 'uint16');
-                mantissa = zeros(1, 3*inputArgs.levels + 1, 'uint16');
-                for i=1:length(Wb)
+                exponent = zeros(1, 3 * inputArgs.levels + 1, 'uint16');
+                mantissa = zeros(1, 3 * inputArgs.levels + 1, 'uint16');
+                for i = 1:length(Wb)
                     [exponent(i), mantissa(i)] = step_to_eps_mu(Wb(i), inputArgs.qstep);
                 end
                 inObj.QCD = QCD_marker(inputArgs.guard, inputArgs.levels, transformation, is_derived, exponent, mantissa);
             end
-            
+
             %% create parameter set for COC marker segment
             if isempty(inputArgs.cParam) == false
                 for nc = 0:inObj.SIZ.Csiz - 1
@@ -170,7 +172,7 @@ classdef j2k_main_header < handle
                     if isempty(obj)
                         continue;
                     end
-                    
+
                     NL = obj.levels;
                     cobj = obj;
                     while isempty(NL)
@@ -178,7 +180,7 @@ classdef j2k_main_header < handle
                         NL = p.levels;
                         cobj = p;
                     end
-                    
+
                     rev = obj.reversible;
                     cobj = obj;
                     while isempty(rev)
@@ -190,7 +192,7 @@ classdef j2k_main_header < handle
                     if strcmp(rev, 'yes') == true
                         transformation = 1;
                     end
-                    
+
                     Cmodes = obj.Cmodes;
                     cobj = obj;
                     while isempty(Cmodes)
@@ -198,7 +200,7 @@ classdef j2k_main_header < handle
                         Cmodes = p.Cmodes;
                         cobj = p;
                     end
-                    
+
                     upre = obj.use_precincts;
                     cobj = obj;
                     while isempty(upre)
@@ -221,9 +223,10 @@ classdef j2k_main_header < handle
                         PPx = log2(pre(:, 2));
                         PPy = log2(pre(:, 1));
                     else
-                        PPx = 15; PPy = 15;
+                        PPx = 15;
+                        PPy = 15;
                     end
-                    
+
                     cblk = obj.blk;
                     cobj = obj;
                     while isempty(cblk)
@@ -233,16 +236,17 @@ classdef j2k_main_header < handle
                     end
                     blk_log2_size_x = log2(cblk(:, 2));
                     blk_log2_size_y = log2(cblk(:, 1));
-                    if isempty(obj.levels) == false || isempty(obj.use_precincts)  == false || ...
-                            isempty(obj.precincts)  == false || isempty(obj.reversible)  == false || ...
-                            isempty(obj.blk)  == false || isempty(obj.Cmodes)  == false
-                        
-                        inObj.COC = [inObj.COC COC_marker(inObj.SIZ.Csiz, obj.idx, is_maximum_precincts ...
+                    if isempty(obj.levels) == false || isempty(obj.use_precincts) == false || ...
+                            isempty(obj.precincts) == false || isempty(obj.reversible) == false || ...
+                            isempty(obj.blk) == false || isempty(obj.Cmodes) == false
+
+                        inObj.COC = [inObj.COC, COC_marker(inObj.SIZ.Csiz, obj.idx, is_maximum_precincts ...
                             , NL, blk_log2_size_x - 2, blk_log2_size_y - 2 ...
                             , Cmodes, transformation, PPx, PPy)];
                     end
                 end
             end
+
             %% create parameter set for QCC marker segment
             if isempty(inputArgs.cParam) == false
                 for nc = 0:inObj.SIZ.Csiz - 1
@@ -250,7 +254,7 @@ classdef j2k_main_header < handle
                     if (isempty(obj) || isempty(obj.qstep) == true || isempty(obj.guard) == true) && isempty(findobj(inObj.COC, 'Ccoc', nc)) == true
                         continue;
                     end
-                    
+
                     NL = obj.levels;
                     cobj = obj;
                     while isempty(NL)
@@ -258,7 +262,7 @@ classdef j2k_main_header < handle
                         NL = p.levels;
                         cobj = p;
                     end
-                    
+
                     rev = obj.reversible;
                     cobj = obj;
                     while isempty(rev)
@@ -270,7 +274,7 @@ classdef j2k_main_header < handle
                     if strcmp(rev, 'yes') == true
                         transformation = 1;
                     end
-                    
+
                     nG = obj.guard;
                     cobj = obj;
                     while isempty(nG)
@@ -278,7 +282,7 @@ classdef j2k_main_header < handle
                         nG = p.guard;
                         cobj = p;
                     end
-                    
+
                     qs = obj.qstep;
                     cobj = obj;
                     while isempty(qs)
@@ -289,13 +293,13 @@ classdef j2k_main_header < handle
                     if isempty(obj.qstep) == false || isempty(obj.guard) == false || isempty(obj.levels) == false && obj.levels ~= inputArgs.levels || isempty(obj.reversible) == false && strcmp(obj.reversible, inputArgs.reversible)
                         % quantization step size is derived ?
                         is_derived = false;
-                        
+
                         % set exponent and mantissa for step size
                         if transformation == 1
                             % lossless
                             BIBO_gain = get_BIBO_gain(NL, transformation);
-                            exponent = zeros(1, 3*NL + 1, 'uint8');
-                            for i=1:3*NL+1
+                            exponent = zeros(1, 3 * NL + 1, 'uint8');
+                            for i = 1:3 * NL + 1
                                 gain = BIBO_gain(i);
                                 range = inputArgs.bitDepth - nG;
                                 while gain > 0.9
@@ -307,21 +311,21 @@ classdef j2k_main_header < handle
                             exponent = exponent + use_YCbCr_trafo;
                             exponent = bitshift(exponent, 3);
                             % create marker
-                            inObj.QCC = [inObj.QCC QCC_marker(inObj.SIZ.Csiz, nc, nG, NL, transformation, is_derived, exponent)];
+                            inObj.QCC = [inObj.QCC, QCC_marker(inObj.SIZ.Csiz, nc, nG, NL, transformation, is_derived, exponent)];
                         else
                             % lossy
                             Wb = weight_mse(NL, transformation);
-                            exponent = zeros(1, 3*NL + 1, 'uint16');
-                            mantissa = zeros(1, 3*NL + 1, 'uint16');
-                            for i=1:length(Wb)
+                            exponent = zeros(1, 3 * NL + 1, 'uint16');
+                            mantissa = zeros(1, 3 * NL + 1, 'uint16');
+                            for i = 1:length(Wb)
                                 [exponent(i), mantissa(i)] = step_to_eps_mu(Wb(i), qs);
                             end
-                            inObj.QCC = [inObj.QCC QCC_marker(inObj.SIZ.Csiz, nc, nG, NL, transformation, is_derived, exponent, mantissa)];
+                            inObj.QCC = [inObj.QCC, QCC_marker(inObj.SIZ.Csiz, nc, nG, NL, transformation, is_derived, exponent, mantissa)];
                         end
                     end
                 end
             end
-            
+
             %% prepare PPT marker segments, if necessary
             use_PPT = zeros(1, numTiles_y * numTiles_x, 'logical');
             if length(inputArgs.PPT_tiles) > numTiles_y * numTiles_x
@@ -329,11 +333,11 @@ classdef j2k_main_header < handle
             end
             for i = 1:length(inputArgs.PPT_tiles)
                 if inputArgs.PPT_tiles(i) >= 0
-                    use_PPT(inputArgs.PPT_tiles(i)+1) = true;
+                    use_PPT(inputArgs.PPT_tiles(i) + 1) = true;
                     assert(use_PPM == false, 'ERROR: PPM and PPT marker segments cannot be used together.');
                 end
             end
-            
+
             %% prepare PLT marker segments, if necessary
             use_PLT = zeros(1, numTiles_y * numTiles_x, 'logical');
             if length(inputArgs.PLT_tiles) > numTiles_y * numTiles_x
@@ -341,13 +345,13 @@ classdef j2k_main_header < handle
             end
             for i = 1:length(inputArgs.PLT_tiles)
                 if inputArgs.PLT_tiles(i) >= 0
-                    use_PLT(inputArgs.PLT_tiles(i)+1) = true;
+                    use_PLT(inputArgs.PLT_tiles(i) + 1) = true;
                 end
             end
-            
+
             %% create parameter set for CAP marker segment
             if flag_CAP == true
-                Pcap = 2^(32-15);
+                Pcap = 2^(32 - 15);
                 flag_HTONLY = true;
                 flag_HTDECLARED = false;
                 if bitand(bitshift(inputArgs.Cmodes, -6), 1) == false
@@ -380,10 +384,10 @@ classdef j2k_main_header < handle
                 if flag_HTONLY == false
                     flag_HTDECLARED = true;
                 end
-                Bits14_15 = flag_HTDECLARED*2*(flag_HTONLY == false);
+                Bits14_15 = flag_HTDECLARED * 2 * (flag_HTONLY == false);
                 Bit13 = 0; % 0:SINGLEHT, 1:MULTIHT
                 Bit12 = 0; % 0:RGNFREE, 1:RGN
-                HET_flag= false;
+                HET_flag = false;
                 if isempty(inputArgs.tParam) == false || isempty(inputArgs.tcParam) == false || nnz(use_PPT) ~= 0
                     HET_flag = true;
                 end
@@ -399,8 +403,8 @@ classdef j2k_main_header < handle
                 end
                 Bits0_4 = 0;
                 % MAGB may be renewed later
-                Ccap15 = Bits14_15*2^14 + Bit13*2^13 + Bit12*2^12 + Bit11*2^11 ...
-                    + Bit5*2^5 + Bits0_4;
+                Ccap15 = Bits14_15 * 2^14 + Bit13 * 2^13 + Bit12 * 2^12 + Bit11 * 2^11 ...
+                    +Bit5 * 2^5 + Bits0_4;
                 inObj.CAP = CAP_marker(Pcap, Ccap15);
             end
             if isempty(inputArgs.main_POC) == false
@@ -410,13 +414,14 @@ classdef j2k_main_header < handle
                 inObj.POC = inputArgs.main_POC;
                 n = inObj.POC.number_progression_order_change;
                 if inObj.SIZ.Csiz < 257
-                    inObj.POC.Lpoc = 2 + 7*n;
+                    inObj.POC.Lpoc = 2 + 7 * n;
                 else
-                    inObj.POC.Lpoc = 2 + 9*n;
+                    inObj.POC.Lpoc = 2 + 9 * n;
                 end
             end
+
             %% create parameter set for COM marker segment
-            comment = uint8('Kakadu-vxt7.10.6-Beta2');%'OsamuOsamuOsamuOsamuOs');
+            comment = uint8('Kakadu-vxt7.10.6-Beta2'); %'OsamuOsamuOsamuOsamuOs');
             if isempty(comment) == false
                 inObj.COM = COM_marker(comment, 1);
             end
@@ -426,16 +431,17 @@ classdef j2k_main_header < handle
             inObj.SIZ.write_SIZ(JP2markers, hDdst);
             % CAP
             if isempty(inObj.CAP) == false
+
                 %% TODO: considering how to determine rev or irrev when only tilepart COD or COC has HT mode
                 if inObj.COD.get_transformation() == 1
-                    MAGB = uint16(max(inObj.QCD.get_exponent()));% lossless
+                    MAGB = uint16(max(inObj.QCD.get_exponent())); % lossless
                 else
-                    MAGB = uint16(min(inObj.QCD.get_exponent()));% lossy: not precise, the actual \mu?
+                    MAGB = uint16(min(inObj.QCD.get_exponent())); % lossy: not precise, the actual \mu?
                 end
                 if MAGB < 27
                     Bits0_4 = MAGB - 8;
-                elseif MAGB <=71
-                    Bits0_4 = (MAGB - 27)/4 + 19;
+                elseif MAGB <= 71
+                    Bits0_4 = (MAGB - 27) / 4 + 19;
                 else
                     Bits0_4 = 31;
                 end
@@ -471,7 +477,7 @@ classdef j2k_main_header < handle
                     inObj.COM(i).write_COM(JP2markers, hDdst);
                 end
             end
-            
+
             % PPM, if necessary
             if use_PPM == true
                 inObj.PPM = PPM_marker;
@@ -525,7 +531,7 @@ classdef j2k_main_header < handle
             if isempty(inObj.COC) == true
                 inObj.COC = COC_marker;
             else
-                inObj.COC = [inObj.COC COC_marker];
+                inObj.COC = [inObj.COC, COC_marker];
             end
             inObj.COC(end).read_COC(hDsrc, inObj.SIZ.Csiz);
         end
@@ -533,7 +539,7 @@ classdef j2k_main_header < handle
             if isempty(inObj.QCC) == true
                 inObj.QCC = QCC_marker;
             else
-                inObj.QCC = [inObj.QCC QCC_marker];
+                inObj.QCC = [inObj.QCC, QCC_marker];
             end
             inObj.QCC(end).read_QCC(hDsrc, inObj.SIZ.Csiz);
         end
@@ -541,7 +547,7 @@ classdef j2k_main_header < handle
             if isempty(inObj.RGN) == true
                 inObj.RGN = RGN_marker;
             else
-                inObj.RGN = [inObj.RGN RGN_marker];
+                inObj.RGN = [inObj.RGN, RGN_marker];
             end
             inObj.RGN(end).read_RGN(hDsrc, inObj.SIZ.Csiz);
         end
@@ -557,7 +563,7 @@ classdef j2k_main_header < handle
             if isempty(inObj.PPM) == true
                 inObj.PPM = PPM_marker;
             else
-                inObj.PPM = [inObj.PPM PPM_marker];
+                inObj.PPM = [inObj.PPM, PPM_marker];
             end
             inObj.PPM(end).read_PPM(hDsrc);
         end
@@ -565,7 +571,7 @@ classdef j2k_main_header < handle
             if isempty(inObj.TLM) == true
                 inObj.TLM = TLM_marker;
             else
-                inObj.TLM = [inObj.TLM TLM_marker];
+                inObj.TLM = [inObj.TLM, TLM_marker];
             end
             inObj.TLM(end).read_TLM(hDsrc);
         end
@@ -581,7 +587,7 @@ classdef j2k_main_header < handle
             if isempty(inObj.COM) == true
                 inObj.COM = COM_marker;
             else
-                inObj.COM = [inObj.COM COM_marker];
+                inObj.COM = [inObj.COM, COM_marker];
             end
             inObj.COM(end).read_COM(hDsrc);
             if inObj.COM(end).Rcom == 1

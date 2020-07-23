@@ -1,7 +1,7 @@
 function HT_MagRef_encode(bitplane, sigma_n, state_MR_enc)
 
 [H_blk, W_blk] = size(sigma_n);
-num_v_stripe = floor(H_blk/4);
+num_v_stripe = floor(H_blk / 4);
 
 i_start = 1;
 

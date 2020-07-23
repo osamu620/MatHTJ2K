@@ -21,13 +21,13 @@ classdef colour_specification_box < jp2_box_base
                 inObj.EnumCS = get_dword(inObj.DBox);
             elseif inObj.METH == 2
                 fprintf('Rstricted ICC profile\n');
-                inObj.PROFILE = get_N_byte(inObj.DBox, inObj.LBox - (4+4+3));
-                fid = fopen('tmpicc.icc' ,'wb');
+                inObj.PROFILE = get_N_byte(inObj.DBox, inObj.LBox - (4 + 4 + 3));
+                fid = fopen('tmpicc.icc', 'wb');
                 fwrite(fid, inObj.PROFILE);
                 fclose(fid);
             elseif inObj.METH == 3
                 fprintf('Any ICC profile\n');
-                inObj.PROFILE = get_N_byte(inObj.DBox, inObj.LBox - (4+4+3));
+                inObj.PROFILE = get_N_byte(inObj.DBox, inObj.LBox - (4 + 4 + 3));
             else
                 fprintf('Parameterized Colourspace\n');
                 assert(inObj.METH == 5);
@@ -52,8 +52,8 @@ classdef colour_specification_box < jp2_box_base
             inObj.PREC = 0;
             inObj.APPROX = 0;
         end
-        function  write_contents(inObj, hDdst)
-            assert(isa(hDdst,'jp2_data_destination'));
+        function write_contents(inObj, hDdst)
+            assert(isa(hDdst, 'jp2_data_destination'));
             inObj.write_box_base(hDdst);
             hDdst.put_byte(inObj.METH);
             hDdst.put_byte(inObj.PREC);

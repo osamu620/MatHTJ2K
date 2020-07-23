@@ -1,8 +1,8 @@
 classdef state_SP_enc < handle
     properties
         SP_pos uint32
-        SP_bits uint8 
-        SP_max  uint8
+        SP_bits uint8
+        SP_max uint8
         SP_tmp uint8
         SP_buf uint8
     end

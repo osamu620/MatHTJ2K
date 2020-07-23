@@ -22,7 +22,7 @@ if a == uint8('+') || a == uint8('-')
     if a == uint8('-')
         is_signed = true;
     end
-    
+
     a = eat_space(fid);
 end
 bitDepth = 0;
@@ -31,22 +31,22 @@ while a ~= ' '
     %     if a == '+' || a == '-'
     %         a = fread(fid, 1, '*char');
     %     end
-    bitDepth = bitDepth*10 + double(a) - 48;
+    bitDepth = bitDepth * 10 + double(a) - 48;
     a = fread(fid, 1, 'uint8');
 end
 
 a = eat_space(fid);
 width = 0;
 while a ~= ' '
-    width = width*10 + double(a) - 48;
+    width = width * 10 + double(a) - 48;
     a = fread(fid, 1, 'uint8');
 end
 
 
 a = eat_space(fid);
 height = 0;
-while a ~= 10 && a~= 13
-    height = height*10 + double(a) - 48;
+while a ~= 10 && a ~= 13
+    height = height * 10 + double(a) - 48;
     a = fread(fid, 1, 'uint8');
     if a == uint8('\n')
         a = fread(fid, 1, 'uint8');
@@ -55,7 +55,7 @@ end
 
 num_samples = width * height;
 tmp = zeros(1, num_samples);
-byte_per_sample = ceil(bitDepth/8);
+byte_per_sample = ceil(bitDepth / 8);
 if byte_per_sample == 1
     if is_signed == true
         tmp = fread(fid, num_samples, 'int8');
@@ -76,7 +76,7 @@ elseif byte_per_sample == 4
     end
 end
 
-out = reshape(tmp, [width height])';
+out = reshape(tmp, [width, height])';
 end
 
 function out = eat_space(fid)
@@ -85,6 +85,3 @@ while out == uint8(' ') || out == 10 || out == 13
     out = fread(fid, 1, 'uint8');
 end
 end
-
-
-

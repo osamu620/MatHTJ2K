@@ -49,7 +49,7 @@ classdef image_header_box < jp2_box_base
             inObj.IPR = 0;
         end
         function write_contents(inObj, hDdst)
-            assert(isa(hDdst,'jp2_data_destination'));
+            assert(isa(hDdst, 'jp2_data_destination'));
             inObj.write_box_base(hDdst);
             hDdst.put_dword(inObj.HEIGHT);
             hDdst.put_dword(inObj.WIDTH);
@@ -61,4 +61,3 @@ classdef image_header_box < jp2_box_base
         end
     end
 end
-

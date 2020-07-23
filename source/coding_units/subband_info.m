@@ -39,7 +39,7 @@ classdef subband_info < handle
             else
                 tmpObj = subband_info(b, px, py, sx, sy, data, eb, nGb);
             end
-            outObj = [inObj tmpObj];
+            outObj = [inObj, tmpObj];
         end
     end
 end

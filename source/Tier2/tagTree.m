@@ -19,8 +19,8 @@ classdef tagTree < matlab.mixin.Copyable
                 while 1
                     n = x * y;
                     num_nodes = num_nodes + uint32(n);
-                    x = ceil(x/2);
-                    y = ceil(y/2);
+                    x = ceil(x / 2);
+                    y = ceil(y / 2);
                     if ~(n > 1)
                         break;
                     else
@@ -28,11 +28,11 @@ classdef tagTree < matlab.mixin.Copyable
                     end
                 end
                 Obj.numNode = num_nodes;
-                for i=1:Obj.numNode
-                    if i==1
+                for i = 1:Obj.numNode
+                    if i == 1
                         Obj.node = tagTreeNode;
                     else
-                        Obj.node = [Obj.node tagTreeNode];
+                        Obj.node = [Obj.node, tagTreeNode];
                     end
                 end
                 nodeidx = int32(1);
@@ -40,7 +40,7 @@ classdef tagTree < matlab.mixin.Copyable
                 parentnum = 1;
                 x = Obj.numCblkX;
                 y = Obj.numCblkY;
-                
+
                 % build tag-tree from leaf nodes
                 level = Obj.level - 1; % temporal value
                 while 1
@@ -50,27 +50,27 @@ classdef tagTree < matlab.mixin.Copyable
                     end
                     parentnum = parentnum + n;
                     row_parent_idx = parentnum;
-                    for j=1:y
+                    for j = 1:y
                         parent_idx = row_parent_idx;
-                        for i=1:x
+                        for i = 1:x
                             node.level = level;
                             parent = Obj.node(parent_idx);
                             node.idx = nodeidx;
                             node.parent_idx = parent_idx;
-                            parent.child_idx = [parent.child_idx nodeidx];
+                            parent.child_idx = [parent.child_idx, nodeidx];
                             nodeidx = nodeidx + 1;
                             node = Obj.node(nodeidx);
-                            
+
                             if mod(i, 2) == 0 && i ~= x
                                 parent_idx = parent_idx + 1; % move to next parent in horizontal
                             end
                         end
                         if mod(j, 2) == 0
-                            row_parent_idx = row_parent_idx + ceil(x/2); % move to next parent in vertical
+                            row_parent_idx = row_parent_idx + ceil(x / 2); % move to next parent in vertical
                         end
                     end
-                    x = ceil(x/2); % number of horizontal elements for next level
-                    y = ceil(y/2); % number of vertical elements for next level
+                    x = ceil(x / 2); % number of horizontal elements for next level
+                    y = ceil(y / 2); % number of vertical elements for next level
                     level = level - 1;
                 end
                 rootNode = Obj.node(num_nodes);

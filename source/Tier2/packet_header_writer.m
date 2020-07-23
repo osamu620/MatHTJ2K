@@ -14,7 +14,7 @@ classdef packet_header_writer < handle
             outObj.bits = uint8(8);
             outObj.num_bytes = uint32(0);
         end
-        function put_bit(inObj, bit)            
+        function put_bit(inObj, bit)
             if inObj.bits == uint8(0)
                 inObj.last_byte = inObj.byte;
                 % if the last byte was FF, next 1 bit shall be skipped.
@@ -33,7 +33,7 @@ classdef packet_header_writer < handle
             % DEBUG
             %fprintf('\t\t  bit: %d, byte: %d, bit_pos:%d\n', bit, inObj.byte, inObj.bits);
         end
-        function  put_bits(inObj, codeword, bits_to_write)
+        function put_bits(inObj, codeword, bits_to_write)
             %codeword = uint32(0);
             for i = bits_to_write - 1:-1:0
                 bit = bitand(bitshift(codeword, -i), 1);
@@ -54,7 +54,7 @@ classdef packet_header_writer < handle
                 inObj.num_bytes = inObj.num_bytes + 1;
             end
             if is_use_EPH == true
-                inObj.buf(inObj.num_bytes + 1:inObj.num_bytes + 2) = [255 146];
+                inObj.buf(inObj.num_bytes + 1:inObj.num_bytes + 2) = [255, 146];
             end
         end
     end

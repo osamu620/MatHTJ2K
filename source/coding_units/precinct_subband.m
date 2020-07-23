@@ -3,7 +3,7 @@ classdef precinct_subband < handle
         precinct_idx_x uint32
         precinct_idx_y uint32
         band_idx uint8
-        epsilon_b uint8 
+        epsilon_b uint8
         mantissa_b uint16
         Delta_b double
         normalized_delta double
@@ -21,7 +21,7 @@ classdef precinct_subband < handle
         numCblksY uint32
         CblkSizX uint16
         CblkSizY uint16
-        Cblks  codeblock_body
+        Cblks codeblock_body
         quantized_coeffs
         dwt_coeffs
         is_reversible logical
@@ -79,7 +79,7 @@ classdef precinct_subband < handle
             end
         end
         function add_codeblockinfo_to_pband(inObj, cblk)
-            inObj.Cblks = [inObj.Cblks cblk];
+            inObj.Cblks = [inObj.Cblks, cblk];
         end
     end
 end

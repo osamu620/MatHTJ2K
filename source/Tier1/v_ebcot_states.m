@@ -1,4 +1,4 @@
-classdef v_ebcot_states 
+classdef v_ebcot_states
     properties
         sigma int32
         sigma_ int32
@@ -11,7 +11,7 @@ classdef v_ebcot_states
             outObj.sigma = inObj.sigma;
             outObj.sigma_ = inObj.sigma_;
             outObj.dummy_sigma = inObj.dummy_sigma;
-            outObj.pi_  = inObj.pi_;
+            outObj.pi_ = inObj.pi_;
             outObj.is_causal = inObj.is_causal;
         end
     end

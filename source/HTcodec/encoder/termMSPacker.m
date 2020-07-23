@@ -9,7 +9,7 @@ if state_MS.MS_bits > 0
         state_MS.MS_bits = state_MS.MS_bits + 1;
     end
     if state_MS.MS_tmp ~= x_FF
-        MS_buf(state_MS.MS_pos+M_OFFSET) = state_MS.MS_tmp;
+        MS_buf(state_MS.MS_pos + M_OFFSET) = state_MS.MS_tmp;
         state_MS.MS_pos = state_MS.MS_pos + 1;
     end
 elseif state_MS.MS_max == uint8(7)

@@ -9,12 +9,13 @@ HT_MIXED = uint16(128);
 HT_PHLD = uint16(256);
 
 %% raster index is for tagtree decoding
-rasterCblkIdx = hCodeblock.idx_x + (hCodeblock.idx_y)*hPband.numCblksX + M_OFFSET;
+rasterCblkIdx = hCodeblock.idx_x + (hCodeblock.idx_y) * hPband.numCblksX + M_OFFSET;
 
-number_of_bytes = 0;% initialize to zero in case of `not included`.
+number_of_bytes = 0; % initialize to zero in case of `not included`.
 hCodeblock.layer_start(layer_idx + M_OFFSET) = uint32(sum(hCodeblock.layer_passes));
 
 if hCodeblock.already_included == false
+
     %% Flags for placeholder passes and mixed mode
     if hCodeblock.Cmodes >= 64 % HTJ2K was used for this codestream
         % adding HT_PHLD flag because an HT codeblock may include placeholder passes
@@ -23,24 +24,26 @@ if hCodeblock.already_included == false
             hCodeblock.Cmodes = bitor(hCodeblock.Cmodes, HT_MIXED);
         end
     end
+
     %% Retrieve codeblock inclusion
     if DEBUG == 1
         fprintf('\t\tinclusion start\n');
     end
     assert(hCodeblock.fast_skip_passes == 0);
+
     %% Special case; A codeblock is not included in the first layer(layer 0).
-    %  Inclusion information of layer 0 (i.e. before the first contribution) shall be decoded. 
+    %  Inclusion information of layer 0 (i.e. before the first contribution) shall be decoded.
     if layer_idx > 0
         % decode tagtree information
         current_node = hPband.inclusionInfo.node(rasterCblkIdx);
         tree_path = current_node.idx;
         while current_node.parent_idx ~= 0
-            current_node =  hPband.inclusionInfo.node(current_node.parent_idx);
-            tree_path = [tree_path current_node.idx];
+            current_node = hPband.inclusionInfo.node(current_node.parent_idx);
+            tree_path = [tree_path, current_node.idx];
         end
         is_included = false; % Does this code-block contribute this layer?
         threshold = 0; % THIS MAY BE OTHER THAN 0
-        for i=length(tree_path):-1:1
+        for i = length(tree_path):-1:1
             current_node = hPband.inclusionInfo.node(tree_path(i));
             if current_node.state == 0
                 if current_node.level > 0 % not root node
@@ -62,18 +65,19 @@ if hCodeblock.already_included == false
             end
         end
     end
+
     %% Normal case of inclusion information
     % decode tagtree information
     current_node = hPband.inclusionInfo.node(rasterCblkIdx);
     tree_path = current_node.idx;
     while current_node.parent_idx ~= 0
-        current_node =  hPband.inclusionInfo.node(current_node.parent_idx);
-        tree_path = [tree_path current_node.idx];
+        current_node = hPband.inclusionInfo.node(current_node.parent_idx);
+        tree_path = [tree_path, current_node.idx];
     end
     is_included = false; % Does this code-block contribute this layer?
-    
+
     threshold = layer_idx;
-    for i=length(tree_path):-1:1
+    for i = length(tree_path):-1:1
         current_node = hPband.inclusionInfo.node(tree_path(i));
         if current_node.state == 0
             if current_node.level > 0 % not root node
@@ -97,6 +101,7 @@ if hCodeblock.already_included == false
     if DEBUG == 1
         fprintf('\t\tinclusion end %d\n', is_included);
     end
+
     %% Retrieve number of zero bit planes
     if hCodeblock.already_included == false && is_included == true
         hCodeblock.already_included = true;
@@ -108,9 +113,9 @@ if hCodeblock.already_included == false
         tree_path = current_node.idx;
         while current_node.parent_idx ~= 0
             current_node = hPband.ZBPInfo.node(current_node.parent_idx);
-            tree_path = [tree_path current_node.idx];
+            tree_path = [tree_path, current_node.idx];
         end
-        for i=length(tree_path):-1:1
+        for i = length(tree_path):-1:1
             current_node = hPband.ZBPInfo.node(tree_path(i));
             if current_node.level > 0 % not a root node
                 if current_node.current_value < hPband.ZBPInfo.node(current_node.parent_idx).current_value
@@ -140,6 +145,7 @@ else % this codeblock has been already included in previous packets
         is_included = false;
     end
 end
+
 %% Retrieve number of coding passes in this layer
 if is_included == true
     if DEBUG == 1
@@ -165,24 +171,25 @@ if is_included == true
         end
     end
     new_passes = int32(new_passes);
-    hCodeblock.layer_passes(layer_idx+M_OFFSET) = uint32(new_passes);
+    hCodeblock.layer_passes(layer_idx + M_OFFSET) = uint32(new_passes);
     if DEBUG == 1
         fprintf('\t\tnewpass end, new_passes = %d\n', new_passes);
     end
     if DEBUG == 2
         fprintf('* num_passes = %2d, ', hCodeblock.num_passes);
     end
+
     %% Retirieve LBlock
     bit = packetHeader.get_bit();
     while bit == 1
         hCodeblock.LBlock = hCodeblock.LBlock + 1;
         bit = packetHeader.get_bit();
     end
-    
+
     bypass_term_threshold = 0;
     bits_to_read = 0;
     pass_idx = hCodeblock.num_passes;
-    segment_bytes = uint32(0);% the same as 'codeword'
+    segment_bytes = uint32(0); % the same as 'codeword'
     segment_passes = 0;
     next_segment_passes = 0;
     if DEBUG == 2
@@ -218,7 +225,7 @@ if is_included == true
                 pass_bound = pass_bound + pass_bound;
             end
             segment_bytes = packetHeader.get_bits(bits_to_read);
-            
+
             if segment_bytes ~= 0
                 % No more placeholder passes
                 if ~bitand(hCodeblock.Cmodes, HT_MIXED)
@@ -228,7 +235,7 @@ if is_included == true
                     end
                     next_segment_passes = 2;
                     hCodeblock.Cmodes = bitand(hCodeblock.Cmodes, bitcmp(HT_PHLD));
-                elseif hCodeblock.LBlock > 3 && segment_bytes > 1 && bitshift(segment_bytes, -(bits_to_read -1)) == 0
+                elseif hCodeblock.LBlock > 3 && segment_bytes > 1 && bitshift(segment_bytes, -(bits_to_read - 1)) == 0
                     % Must be the first HT Cleanup pass, since length MSB is 0
                     next_segment_passes = 2;
                     hCodeblock.Cmodes = bitand(hCodeblock.Cmodes, bitcmp(HT_PHLD));
@@ -239,7 +246,7 @@ if is_included == true
                     while pass_bound <= segment_passes
                         bits_to_read = bits_to_read + 1;
                         pass_bound = pass_bound + pass_bound;
-                        segment_bytes = 2*segment_bytes + uint32(packetHeader.get_bit());
+                        segment_bytes = 2 * segment_bytes + uint32(packetHeader.get_bit());
                     end
                 end
             else
@@ -253,7 +260,7 @@ if is_included == true
                     while 1
                         bits_to_read = bits_to_read + 1;
                         pass_bound = pass_bound + pass_bound;
-                        segment_bytes = 2*segment_bytes + uint32(packetHeader.get_bit());
+                        segment_bytes = 2 * segment_bytes + uint32(packetHeader.get_bit());
                         if pass_bound > segment_passes
                             break;
                         end
@@ -291,7 +298,7 @@ if is_included == true
         end
         bits_to_read = bits_to_read + hCodeblock.LBlock;
         segment_bytes = packetHeader.get_bits(bits_to_read);
-    elseif ~bitand(hCodeblock.Cmodes, RESTART+BYPASS)
+    elseif ~bitand(hCodeblock.Cmodes, RESTART + BYPASS)
         % Common case for non-HT code-blocks; we have only one segment
         bits_to_read = hCodeblock.LBlock + floor(log2(double(new_passes)));
         segment_bytes = packetHeader.get_bits(bits_to_read);
@@ -331,18 +338,18 @@ if is_included == true
         bits_to_read = int32(bits_to_read) + hCodeblock.LBlock;
         segment_bytes = packetHeader.get_bits(bits_to_read);
     end
-    hCodeblock.num_passes = hCodeblock.num_passes + uint8(segment_passes);%new_passes;
+    hCodeblock.num_passes = hCodeblock.num_passes + uint8(segment_passes); %new_passes;
     hCodeblock.pass_length(hCodeblock.num_passes + 0) = int32(segment_bytes);
     number_of_bytes = number_of_bytes + segment_bytes;
-    
+
     if DEBUG == 2
         if isempty(href_passes) == false
-            fprintf('1st bits = %2d, LBlock = %2d, new_passes %2d, x =   %d, segment_passes = %2d, length = %4d ', bits_to_read, hCodeblock.LBlock, new_passes, href_passes, segment_passes, segment_bytes);%%%%%%
+            fprintf('1st bits = %2d, LBlock = %2d, new_passes %2d, x =   %d, segment_passes = %2d, length = %4d ', bits_to_read, hCodeblock.LBlock, new_passes, href_passes, segment_passes, segment_bytes); %%%%%%
         else
-            fprintf('1st bits = %2d, LBlock = %2d, new_passes %2d, x = NULL, segment_passes = %2d, length = %4d ', bits_to_read, hCodeblock.LBlock, new_passes, segment_passes, segment_bytes);%%%%%%
+            fprintf('1st bits = %2d, LBlock = %2d, new_passes %2d, x = NULL, segment_passes = %2d, length = %4d ', bits_to_read, hCodeblock.LBlock, new_passes, segment_passes, segment_bytes); %%%%%%
         end
     end
-    
+
     if bitand(hCodeblock.Cmodes, HT + HT_PHLD) == HT
         new_passes = new_passes - segment_passes;
         primary_passes = segment_passes + int32(hCodeblock.fast_skip_passes);
@@ -353,7 +360,7 @@ if is_included == true
         empty_set = false;
         if next_segment_passes == 2 && segment_bytes == 0
             empty_set = true;
-        end       
+        end
         while new_passes > 0
             if new_passes > 1
                 segment_passes = next_segment_passes;
@@ -375,7 +382,8 @@ if is_included == true
                     fast_skip_bytes = fast_skip_bytes + primary_bytes + secondary_bytes;
                     primary_passes = primary_passes + 1 + secondary_passes;
                     primary_bytes = segment_bytes;
-                    secondary_bytes = 0; secondary_passes = 0;
+                    secondary_bytes = 0;
+                    secondary_passes = 0;
                     primary_passes = primary_passes + hCodeblock.fast_skip_passes;
                     hCodeblock.fast_skip_passes = 0;
                     empty_set = false;
@@ -397,7 +405,7 @@ if is_included == true
                 end
             end
             if DEBUG == 2
-                fprintf('2nd bits = %2d, LBlock = %2d, new_passes = %2d, length = %4d', bits_to_read, hCodeblock.LBlock, new_passes, segment_bytes);%%%%%%
+                fprintf('2nd bits = %2d, LBlock = %2d, new_passes = %2d, length = %4d', bits_to_read, hCodeblock.LBlock, new_passes, segment_bytes); %%%%%%
             end
             hCodeblock.num_passes = hCodeblock.num_passes + uint8(segment_passes);
             hCodeblock.pass_length(hCodeblock.num_passes + 0) = segment_bytes;
@@ -426,7 +434,7 @@ if is_included == true
             hCodeblock.pass_length(hCodeblock.num_passes + 0) = segment_bytes;
             number_of_bytes = number_of_bytes + segment_bytes;
             if DEBUG == 2
-                fprintf('2nd bits = %2d, LBlock = %2d, new_passes = %2d, length = %4d', bits_to_read, hCodeblock.LBlock, new_passes, segment_bytes);%%%%%%
+                fprintf('2nd bits = %2d, LBlock = %2d, new_passes = %2d, length = %4d', bits_to_read, hCodeblock.LBlock, new_passes, segment_bytes); %%%%%%
             end
         end
     end

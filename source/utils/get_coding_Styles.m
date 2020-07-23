@@ -16,7 +16,7 @@ if nargin == 3
     else
         codingStyleComponent = main_header.COD;
     end
-    if codingStyle.get_multiple_component_transform()  == 1
+    if codingStyle.get_multiple_component_transform() == 1
         assert(codingStyle.get_transformation() == codingStyleComponent.get_transformation(), ...
             'DWT filter(9x7 or 5x3) may be different among components only if ''ycc'' for corresponding tile or main header is ''no.''');
     end

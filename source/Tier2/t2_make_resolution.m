@@ -28,20 +28,20 @@ else
     num_band = 3;
 end
 % deternime position and size of subband
-xob_tab = [0 1 0 1];
-yob_tab = [0 0 1 1];
+xob_tab = [0, 1, 0, 1];
+yob_tab = [0, 0, 1, 1];
 tcx0 = hTileComponent.tcx0;
 tcx1 = hTileComponent.tcx1;
 tcy0 = hTileComponent.tcy0;
 tcy1 = hTileComponent.tcy1;
 for b_idx = b_start:b_stop
-    xob = xob_tab(b_idx+M_OFFSET);
-    yob = yob_tab(b_idx+M_OFFSET);
-    tbx0 = ceil_quotient_int((tcx0-(2^(nb-1)*xob)), 2^nb, 'int32');
-    tby0 = ceil_quotient_int((tcy0-(2^(nb-1)*yob)), 2^nb, 'int32');
-    tbx1 = ceil_quotient_int((tcx1-(2^(nb-1)*xob)), 2^nb, 'int32');
-    tby1 = ceil_quotient_int((tcy1-(2^(nb-1)*yob)), 2^nb, 'int32');
-    
+    xob = xob_tab(b_idx + M_OFFSET);
+    yob = yob_tab(b_idx + M_OFFSET);
+    tbx0 = ceil_quotient_int((tcx0 - (2^(nb - 1) * xob)), 2^nb, 'int32');
+    tby0 = ceil_quotient_int((tcy0 - (2^(nb - 1) * yob)), 2^nb, 'int32');
+    tbx1 = ceil_quotient_int((tcx1 - (2^(nb - 1) * xob)), 2^nb, 'int32');
+    tby1 = ceil_quotient_int((tcy1 - (2^(nb - 1) * yob)), 2^nb, 'int32');
+
     hBandInfo = subband_info;
     hBandInfo.pos_x = tbx0;
     hBandInfo.pos_y = tby0;
@@ -52,14 +52,14 @@ for b_idx = b_start:b_stop
     if isempty(hResolutionInfo.subbandInfo) == true
         hResolutionInfo.subbandInfo = hBandInfo;
     else
-        hResolutionInfo.subbandInfo = [hResolutionInfo.subbandInfo hBandInfo];
+        hResolutionInfo.subbandInfo = [hResolutionInfo.subbandInfo, hBandInfo];
     end
 end
 hResolutionInfo.num_band = num_band;
 
 if DEBUG == 1
     fprintf('r = %d, resolution size (x,y) = (%d,%d)\n', ...
-        r, hResolutionInfo.trx1-hResolutionInfo.trx0,hResolutionInfo.try1-hResolutionInfo.try0);
+        r, hResolutionInfo.trx1 - hResolutionInfo.trx0, hResolutionInfo.try1 - hResolutionInfo.try0);
 end
 % B.6 precinct
 % precinct size in resolution is not the same that in subband!
@@ -67,20 +67,20 @@ PP = codingStyleComponent.get_precinct_size_in_exponent();
 PPx = PP(:, 1);
 PPy = PP(:, 2);
 
-hResolutionInfo.precinct_width = 2^(uint32(PPx(r+M_OFFSET)));
-hResolutionInfo.precinct_height = 2^(uint32(PPy(r+M_OFFSET)));
+hResolutionInfo.precinct_width = 2^(uint32(PPx(r + M_OFFSET)));
+hResolutionInfo.precinct_height = 2^(uint32(PPy(r + M_OFFSET)));
 
 if hResolutionInfo.trx1 > hResolutionInfo.trx0
     hResolutionInfo.numprecinctwide = ...
         ceil_quotient_int(hResolutionInfo.trx1, hResolutionInfo.precinct_width, 'uint32') ...
-        - floor_quotient_int(hResolutionInfo.trx0, hResolutionInfo.precinct_width, 'uint32');
+        -floor_quotient_int(hResolutionInfo.trx0, hResolutionInfo.precinct_width, 'uint32');
 else
     hResolutionInfo.numprecinctwide = 0;
 end
 if hResolutionInfo.try1 > hResolutionInfo.try0
     hResolutionInfo.numprecincthigh = ...
         ceil_quotient_int(hResolutionInfo.try1, hResolutionInfo.precinct_height, 'uint32') ...
-        - floor_quotient_int(hResolutionInfo.try0, hResolutionInfo.precinct_height, 'uint32');
+        -floor_quotient_int(hResolutionInfo.try0, hResolutionInfo.precinct_height, 'uint32');
 else
     hResolutionInfo.numprecincthigh = 0;
 end
@@ -98,15 +98,15 @@ Ptcr_y = int32(2^PPy(r + M_OFFSET));
 % determine precinct size in reduced resolution
 for y = 1:hResolutionInfo.numprecincthigh
     for x = 1:hResolutionInfo.numprecinctwide
-        Etcrp_x = max(Etcr_x, 0 + Ptcr_x * (int32(x-1) + floor_quotient_int(Etcr_x - 0, Ptcr_x, 'int32')));
-        Etcrp_y = max(Etcr_y, 0 + Ptcr_y * (int32(y-1) + floor_quotient_int(Etcr_y - 0, Ptcr_y, 'int32')));
+        Etcrp_x = max(Etcr_x, 0 + Ptcr_x * (int32(x - 1) + floor_quotient_int(Etcr_x - 0, Ptcr_x, 'int32')));
+        Etcrp_y = max(Etcr_y, 0 + Ptcr_y * (int32(y - 1) + floor_quotient_int(Etcr_y - 0, Ptcr_y, 'int32')));
         Ftcrp_x = min(Ftcr_x, 0 + Ptcr_x * (int32(x) + floor_quotient_int(Etcr_x - 0, Ptcr_x, 'int32')));
         Ftcrp_y = min(Ftcr_y, 0 + Ptcr_y * (int32(y) + floor_quotient_int(Etcr_y - 0, Ptcr_y, 'int32')));
         if isempty(hResolutionInfo.precinct_resolution) == true
-            hResolutionInfo.precinct_resolution = precinct_info(x-1, y-1, Etcrp_x, Etcrp_y, Ftcrp_x, Ftcrp_y, r, hResolutionInfo.subbandInfo);
+            hResolutionInfo.precinct_resolution = precinct_info(x - 1, y - 1, Etcrp_x, Etcrp_y, Ftcrp_x, Ftcrp_y, r, hResolutionInfo.subbandInfo);
         else
-            tmp_precinct_resolution = precinct_info(x-1, y-1, Etcrp_x, Etcrp_y, Ftcrp_x, Ftcrp_y, r, hResolutionInfo.subbandInfo);
-            hResolutionInfo.precinct_resolution = [hResolutionInfo.precinct_resolution tmp_precinct_resolution];
+            tmp_precinct_resolution = precinct_info(x - 1, y - 1, Etcrp_x, Etcrp_y, Ftcrp_x, Ftcrp_y, r, hResolutionInfo.subbandInfo);
+            hResolutionInfo.precinct_resolution = [hResolutionInfo.precinct_resolution, tmp_precinct_resolution];
         end
     end
 end

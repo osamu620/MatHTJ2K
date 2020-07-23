@@ -12,12 +12,11 @@ a = in;
 out = zeros(size(a));
 
 col = 1;
-for u = u0:u1-1 % includes u = u0;
-    Y = a(:,col);
+for u = u0:u1 - 1 % includes u = u0;
+    Y = a(:, col);
     Y = reshape(Y, 1, length(Y));
     X = idwt_1d_sr(Y, i0, i1, dwt_filter);
     X = reshape(X, length(X), 1);
     out(:, col) = X;
     col = col + 1;
 end
-

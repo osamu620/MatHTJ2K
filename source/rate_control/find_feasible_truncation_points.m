@@ -7,9 +7,9 @@ assert(length(hCodeblock.pass_length) == length(hCodeblock.distortion_changes));
 pass_slopes = zeros(1, hCodeblock.num_passes);
 pass_log_slopes = zeros(1, hCodeblock.num_passes);
 
-ALGORITHM = 0;
+ALGORITHM = 0; % you can add your own algorithm for RD optimization
 switch ALGORITHM
-    case 0 % Kakadu
+    case 0
         for z = 0:int8(hCodeblock.num_passes) - 1
             delta_L = 0.0;
             delta_D = 0.0;

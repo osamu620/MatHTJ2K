@@ -7,6 +7,7 @@ TilePartmarkers = jp2_markers(false);
 if is_first_tile_part == true
     hTile.header = j2k_tile_part_header;
 end
+
 %% read marker segments
 WORD = get_word(hDsrc);
 while WORD ~= TilePartmarkers.SOD && WORD ~= TilePartmarkers.EOC

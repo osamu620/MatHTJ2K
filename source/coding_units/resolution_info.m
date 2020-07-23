@@ -18,7 +18,7 @@ classdef resolution_info < handle
     methods
         function outObj = add_to_resolution_info(inObj)
             tmpObj = resolution_info;
-            outObj = [inObj tmpObj];
+            outObj = [inObj, tmpObj];
         end
         function add_subband_info_to_resolution_info(inObj, num_subband)
             inObj.num_band = num_subband;

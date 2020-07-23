@@ -1,8 +1,8 @@
 classdef CRG_marker < handle
     properties
         Lcrg uint16
-        Xcrg (1,:) uint16
-        Ycrg (1,:) uint16
+        Xcrg(1, :) uint16
+        Ycrg(1, :) uint16
         is_read logical
     end
     methods
@@ -11,8 +11,8 @@ classdef CRG_marker < handle
             outObj.is_read = false;
         end
         function read_CRG(inObj, hDsrc, Csiz)
-            assert(isa(hDsrc,'jp2_data_source'));
-            assert(isa(inObj,'CRG_marker'), 'input for readCRGmarker() shall be CRG_marker class.');
+            assert(isa(hDsrc, 'jp2_data_source'));
+            assert(isa(inObj, 'CRG_marker'), 'input for readCRGmarker() shall be CRG_marker class.');
             inObj.Lcrg = get_word(hDsrc);
             assert(inObj.Lcrg >= 6 && inObj.Lcrg <= 65534);
             for i = 1:Csiz

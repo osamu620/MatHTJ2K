@@ -32,17 +32,17 @@ classdef jp2_box_base < handle
         end
         %
         function read_box_base(inObj, hDsrc)
-            assert(isa(hDsrc,'jp2_data_source'));
+            assert(isa(hDsrc, 'jp2_data_source'));
             tmpLBox = get_dword(hDsrc);
-            assert(tmpLBox == 0 || tmpLBox == 1 || (tmpLBox >= 8 && tmpLBox < 2^32 -1));
+            assert(tmpLBox == 0 || tmpLBox == 1 || (tmpLBox >= 8 && tmpLBox < 2^32 - 1));
             inObj.LBox = tmpLBox;
-            
-            inObj.TBox =  get_dword(hDsrc);
-            
+
+            inObj.TBox = get_dword(hDsrc);
+
             if inObj.LBox == 0 % Box length was not known when the LBox field was written.
                 inObj.LBox = length(hDsrc.buf) - hDsrc.pos + 8;
             elseif inObj.LBox == 1 % Box length is written as XLBox.
-                inObj.XLBox = uint64(get_dword(hDsrc))*2^32 + uint64(get_dword(hDsrc));
+                inObj.XLBox = uint64(get_dword(hDsrc)) * 2^32 + uint64(get_dword(hDsrc));
             end
             bytes_to_read = 0;
             if isempty(inObj.XLBox) == true
@@ -53,11 +53,9 @@ classdef jp2_box_base < handle
             inObj.DBox = jp2_data_source(get_N_byte(hDsrc, bytes_to_read));
         end
         function write_box_base(inObj, hDdst)
-            assert(isa(hDdst,'jp2_data_destination'));
+            assert(isa(hDdst, 'jp2_data_destination'));
             hDdst.put_dword(inObj.LBox);
             hDdst.put_dword(inObj.TBox);
         end
     end
 end
-        
-        

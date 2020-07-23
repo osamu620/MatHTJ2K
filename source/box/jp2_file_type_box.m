@@ -5,16 +5,16 @@ classdef jp2_file_type_box < jp2_box_base
         CLi uint32
     end
     methods
-        function read_contents(inObj) 
+        function read_contents(inObj)
             inObj.BR = get_dword(inObj.DBox);
             Brand = convert_uint32_to_char(inObj.BR);
             assert(strcmp(Brand, 'jp2 ') || strcmp(Brand, 'jpx ') || strcmp(Brand, 'jph '));
-            
+
             inObj.MinV = get_dword(inObj.DBox);
             if inObj.MinV ~= 0
                 fprintf('WARNING: The value of minor version in FileType Box is invalid.');
             end
-            
+
             i = 1;
             while inObj.DBox.pos < length(inObj.DBox.buf)
                 inObj.CLi(i) = get_dword(inObj.DBox);
@@ -33,13 +33,13 @@ classdef jp2_file_type_box < jp2_box_base
             end
             inObj.MinV = 0;
             inObj.TBox = hex2dec('66747970'); % 'ftyp'
-            inObj.LBox = 4+4+4+4;
+            inObj.LBox = 4 + 4 + 4 + 4;
             for i = 1:length(inObj.CLi)
                 inObj.LBox = inObj.LBox + 4;
             end
         end
         function write_contents(inObj, hDdst)
-            assert(isa(hDdst,'jp2_data_destination'));
+            assert(isa(hDdst, 'jp2_data_destination'));
             inObj.write_box_base(hDdst);
             hDdst.put_dword(inObj.BR);
             hDdst.put_dword(inObj.MinV);

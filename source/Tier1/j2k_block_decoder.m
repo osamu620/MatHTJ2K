@@ -2,12 +2,12 @@ function [q_b_bar, N_b] = j2k_block_decoder(vCodeblock, ROIshift)
 M_OFFSET = 1;
 
 % retrieve codeblock style from COD marker
-CB_BYPASS  = bitand(vCodeblock.Cmodes , 1);
-CB_RESET   = bitshift(bitand(vCodeblock.Cmodes , 2), -1);
-CB_RESTART = bitshift(bitand(vCodeblock.Cmodes , 4), -2);
-CB_CAUSAL  = bitshift(bitand(vCodeblock.Cmodes , 8), -3);
-CB_ERTERM  = bitshift(bitand(vCodeblock.Cmodes ,16), -4);
-CB_SEGMARK = bitshift(bitand(vCodeblock.Cmodes ,32), -5);
+CB_BYPASS = bitand(vCodeblock.Cmodes, 1);
+CB_RESET = bitshift(bitand(vCodeblock.Cmodes, 2), -1);
+CB_RESTART = bitshift(bitand(vCodeblock.Cmodes, 4), -2);
+CB_CAUSAL = bitshift(bitand(vCodeblock.Cmodes, 8), -3);
+CB_ERTERM = bitshift(bitand(vCodeblock.Cmodes, 16), -4);
+CB_SEGMARK = bitshift(bitand(vCodeblock.Cmodes, 32), -5);
 label_uni = 18; % uniform, for SEGMARK
 
 % set EBCOT states
@@ -29,9 +29,9 @@ sig_LUT = get_sig_LUT;
 
 % number of magnitude bit-planes
 K = int32(vCodeblock.M_b) - int32(vCodeblock.num_ZBP);
-num_passes = 3*K - 2;
+num_passes = 3 * K - 2;
 % maximum number of passes, if truncated actual number of passes will be smaller than this.
-max_passes = uint32(3*(int32(vCodeblock.M_b) + ROIshift - int32(vCodeblock.num_ZBP)) - 2);
+max_passes = uint32(3 * (int32(vCodeblock.M_b) + ROIshift - int32(vCodeblock.num_ZBP)) - 2);
 % pass index
 z = uint32(0);
 % pass category (0 = sig, 1 = mag, 2 = cleanup)
@@ -49,7 +49,7 @@ segment_pos = uint32(0);
 % threshold of pass index in BYPASS mode
 bypass_threshold = 0;
 if CB_BYPASS == true
-    bypass_threshold = 10; 
+    bypass_threshold = 10;
 end
 % flag for bypass mode
 is_bypass = false;
@@ -87,7 +87,7 @@ while z < num_decode_pass
             end
         end
         segment_bytes = uint32(0);
-        for n = 0:current_segment_passes-1
+        for n = 0:current_segment_passes - 1
             segment_bytes = segment_bytes + uint32(vCodeblock.pass_length(z + n + M_OFFSET));
         end
         mq_reg_dec.init_coder(segment_pos, segment_bytes, is_bypass);
@@ -96,7 +96,7 @@ while z < num_decode_pass
     if z == 0 || CB_RESET == true
         mq_reg_dec.init_states_for_all_context();
     end
-    
+
     if k == 0
         if is_bypass == true
             decode_j2k_sigprop_pass_raw(sig_LUT, p, states_EBCOT, values_EBCOT, mq_reg_dec, vCodeblock.band_idx);
@@ -114,7 +114,7 @@ while z < num_decode_pass
         if CB_SEGMARK == true
             r = int32(0);
             for i = 1:4
-                r = 2*r + int32(mq_reg_dec.mq_decoder(label_uni));
+                r = 2 * r + int32(mq_reg_dec.mq_decoder(label_uni));
             end
             if r ~= 10
                 fprintf('%d is not equal to 10. Broken codeblock has been detected by SEGMARK\n', r);
@@ -137,10 +137,10 @@ vCodeblock.N_b = int32(vCodeblock.M_b) - values_EBCOT.p;
 
 % ROI decoding
 if ROIshift > 0
-     tmp = double(values_EBCOT.magnitude_array);
-     tmp(tmp >= 2^double(ROIshift)) = bitshift(tmp(tmp >= 2^double(ROIshift)), -ROIshift);
+    tmp = double(values_EBCOT.magnitude_array);
+    tmp(tmp >= 2^double(ROIshift)) = bitshift(tmp(tmp >= 2^double(ROIshift)), -ROIshift);
     [i, j] = find(double(values_EBCOT.magnitude_array) >= 2^double(ROIshift));
-    vCodeblock.N_b(i,j) = vCodeblock.M_b;
+    vCodeblock.N_b(i, j) = vCodeblock.M_b;
     values_EBCOT.magnitude_array = int32(tmp);
 end
 vCodeblock.quantized_coeffs = values_EBCOT.sign_array .* values_EBCOT.magnitude_array;

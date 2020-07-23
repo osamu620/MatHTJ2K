@@ -11,10 +11,9 @@ a = in;
 out = zeros(size(a));
 
 row = 1;
-for v = v0:v1-1 % includes v = v0;
+for v = v0:v1 - 1 % includes v = v0;
     Y = a(row, :);
     X = idwt_1d_sr(Y, i0, i1, dwt_filter);
     out(row, :) = X;
     row = row + 1;
 end
-

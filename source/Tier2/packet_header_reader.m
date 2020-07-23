@@ -33,7 +33,7 @@ classdef packet_header_reader < handle
         end
         function codeword = get_bits(inObj, bits_to_read)
             codeword = uint32(0);
-            for i=1:bits_to_read
+            for i = 1:bits_to_read
                 if inObj.bits == 0
                     inObj.byte = get_byte(inObj.hDsrc);
                     % if the last byte was FF, next 1 bit shall be skipped.

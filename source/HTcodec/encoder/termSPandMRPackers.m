@@ -16,8 +16,8 @@ end
 fuse = int32(bitor(state_SP.SP_tmp, state_MR.MR_tmp));
 
 if bitor(bitand((bitxor(fuse, int32(state_SP.SP_tmp))), SP_mask), ...
-         bitand((bitxor(fuse, int32(state_MR.MR_tmp))), MR_mask)) == 0
-     state_SP.SP_buf(state_SP.SP_pos + M_OFFSET) = fuse;
+        bitand((bitxor(fuse, int32(state_MR.MR_tmp))), MR_mask)) == 0
+    state_SP.SP_buf(state_SP.SP_pos + M_OFFSET) = fuse;
 else
     state_SP.SP_buf(state_SP.SP_pos + M_OFFSET) = state_SP.SP_tmp;
     state_MR.MR_buf(state_MR.MR_pos + M_OFFSET) = state_MR.MR_tmp;

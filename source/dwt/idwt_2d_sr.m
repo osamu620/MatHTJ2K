@@ -7,4 +7,3 @@ a = idwt_2d_interleave(alev_LL, alev_HL, alev_LH, alev_HH, u0, u1, v0, v1);
 a = idwt_hor_sr(a, u0, u1, v0, v1, dwt_filter);
 alev_1_LL = idwt_ver_sr(a, u0, u1, v0, v1, dwt_filter);
 end
-

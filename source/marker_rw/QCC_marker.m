@@ -19,41 +19,41 @@ classdef QCC_marker < handle
                 outObj.Sqcc = 0;
                 n = 0;
                 if is_reversible == true
-                    outObj.Lqcc = Lqcc_base + 3*NL;
-                    n = NL*3 + 1;
+                    outObj.Lqcc = Lqcc_base + 3 * NL;
+                    n = NL * 3 + 1;
                 elseif is_derived == true
                     outObj.Lqcc = Lqcc_base + 1;
                     n = 1;
                     outObj.Sqcc = outObj.Sqcc + 1;
                 else
-                    outObj.Lqcc = Lqcc_base + 1 + 6*NL;
-                    n = NL*3 + 1;
+                    outObj.Lqcc = Lqcc_base + 1 + 6 * NL;
+                    n = NL * 3 + 1;
                     outObj.Sqcc = outObj.Sqcc + 2;
                 end
                 assert(nG < 8 && nG >= 0);
                 outObj.Sqcc = outObj.Sqcc + bitshift(nG, 5);
-                for i=1:n
+                for i = 1:n
                     if is_reversible == true
                         outObj.SPqcc(i) = exponent(i);
                     else
                         outObj.SPqcc(i) = bitshift(exponent(i), 11) ...
-                            + mantissa(i);
+                            +mantissa(i);
                     end
                 end
             end
         end
-        function out = get_number_of_guard_bits(inObj)%uint8
+        function out = get_number_of_guard_bits(inObj) %uint8
             out = bitshift(bitand(bin2dec('11100000'), inObj.Sqcc), -5);
         end
         function out = get_exponent(inObj, NL, Csiz) %uint8
             n = length(inObj.SPqcc);
             out = zeros(1, n, 'uint8');
             if Csiz < 257
-                if inObj.Lqcc == 5 + 3*NL % no-quantization, reversible
+                if inObj.Lqcc == 5 + 3 * NL % no-quantization, reversible
                     for i = 1:n
                         out(i) = bitshift(inObj.SPqcc(i), -3);
                     end
-                elseif inObj.Lqcc == 6 + 6*NL % quantized, irreversible, expounded
+                elseif inObj.Lqcc == 6 + 6 * NL % quantized, irreversible, expounded
                     for i = 1:n
                         out(i) = bitshift(inObj.SPqcc(i), -11);
                     end
@@ -61,11 +61,11 @@ classdef QCC_marker < handle
                     out = bitshift(inObj.SPqcc, -11);
                 end
             else
-                if inObj.Lqcc == 6 + 3*NL % no-quantization, reversible
+                if inObj.Lqcc == 6 + 3 * NL % no-quantization, reversible
                     for i = 1:n
                         out(i) = bitshift(inObj.SPqcc(i), -3);
                     end
-                elseif inObj.Lqcc == 7 + 6*NL % quantized, irreversible, expounded
+                elseif inObj.Lqcc == 7 + 6 * NL % quantized, irreversible, expounded
                     for i = 1:n
                         out(i) = bitshift(inObj.SPqcc(i), -11);
                     end
@@ -77,7 +77,7 @@ classdef QCC_marker < handle
         function out = get_mantissa(inObj) %uint16
             n = length(inObj.SPqcc);
             out = zeros(1, n, 'uint16');
-            mask_Low_11 = uint16(2^11-1);
+            mask_Low_11 = uint16(2^11 - 1);
             for i = 1:n
                 out(i) = bitand(mask_Low_11, inObj.SPqcc(i));
             end
@@ -95,8 +95,8 @@ classdef QCC_marker < handle
             end
         end
         function read_QCC(inObj, hDsrc, Csiz)
-            assert(isa(hDsrc,'jp2_data_source'));
-            assert(isa(inObj,'QCC_marker'), 'input for read_QCC() shall be QCC_marker class.');
+            assert(isa(hDsrc, 'jp2_data_source'));
+            assert(isa(inObj, 'QCC_marker'), 'input for read_QCC() shall be QCC_marker class.');
             inObj.Lqcc = get_word(hDsrc);
             if Csiz < 257
                 inObj.Cqcc = get_byte(hDsrc);
@@ -104,7 +104,7 @@ classdef QCC_marker < handle
                     is_reversible = true;
                     NL = floor_quotient_int(inObj.Lqcc - 5, 3, 'uint8');
                 elseif inObj.Lqcc == 6
-                    NL = 0;% derived
+                    NL = 0; % derived
                     is_reversible = false;
                 else
                     NL = floor_quotient_int(inObj.Lqcc - 6, 6, 'uint8');
@@ -116,7 +116,7 @@ classdef QCC_marker < handle
                     is_reversible = true;
                     NL = floor_quotient_int(inObj.Lqcc - 6, 3, 'uint8');
                 elseif inObj.Lqcc == 7
-                    NL = 0;% derived
+                    NL = 0; % derived
                     is_reversible = false;
                 else
                     NL = floor_quotient_int(inObj.Lqcc - 7, 6, 'uint8');
@@ -126,7 +126,7 @@ classdef QCC_marker < handle
             if NL == 0 % derived
                 n = 1;
             else
-                n = NL*3 + 1;
+                n = NL * 3 + 1;
             end
             %
             inObj.Sqcc = get_byte(hDsrc);
@@ -148,7 +148,7 @@ classdef QCC_marker < handle
             end
             %
             if is_derived == false
-                for i=1:n
+                for i = 1:n
                     if SPqcx_size == 8 % for reversible transform
                         % the first 5 bits are the exponent value of each subband's dynamic range
                         inObj.SPqcc(i) = get_byte(hDsrc);
@@ -163,8 +163,8 @@ classdef QCC_marker < handle
             inObj.is_read = true;
         end
         function write_QCC(inObj, m, hDdst, Csiz, NL, transformation)
-            assert(isa(hDdst,'jp2_data_destination'));
-            assert(isa(inObj,'QCC_marker'), 'input for write_QCC() shall be QCC_marker class.');
+            assert(isa(hDdst, 'jp2_data_destination'));
+            assert(isa(inObj, 'QCC_marker'), 'input for write_QCC() shall be QCC_marker class.');
             put_word(hDdst, m.QCC);
             put_word(hDdst, inObj.Lqcc);
             if Csiz < 257
@@ -172,16 +172,16 @@ classdef QCC_marker < handle
             else
                 put_word(hDdst, inObj.Cqcc);
             end
-            
+
             put_byte(hDdst, inObj.Sqcc);
-            
+
             if NL == 0 % derived
                 n = 1;
             else
-                n = NL*3 + 1;
+                n = NL * 3 + 1;
             end
             %
-            for i=1:n
+            for i = 1:n
                 if transformation == 1 % 5x3 lossless
                     put_byte(hDdst, inObj.SPqcc(i));
                 else % 9x7 lossy

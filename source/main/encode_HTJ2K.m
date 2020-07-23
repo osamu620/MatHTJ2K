@@ -5,13 +5,13 @@ function [elapsedTime, time_for_blockcoding] = encode_HTJ2K(FileName, inputImg, 
 % [total_processing_time(sec), block_copding_time(sec)] = encode_HTJ2K(filename, inputimage, use_MEX, <parameters>)
 %
 % filename                 : File name of compressed image. Extension for file-format shall be ".jp2" or ".jph"
-%                            Exntensions for codestream can be any other extensions. 
+%                            Exntensions for codestream can be any other extensions.
 % inputimage               : Array of input image; supported input classes are uint8, int8, uint16, int16, uint32, int32, single.
 % use_MEX, logical         : If true, MEX version of blockcoding algorithm is used. Default is true.
 %
 % Valid entries of parameters (in any order); d: decimal integer, f:decimal float, s: string vector with ''
 % (Some parameters accept :Td, :Cd or :TdCd after its name to specify a tile or a component.)
-%                          (T and C are index for a tile and a component, respectively.)   
+%                          (T and C are index for a tile and a component, respectively.)
 %
 % 'levels', d, TC          : Number of DWT decomposition level (0 to 32), default is 5.
 % 'reversible', s,  TC     : Reversible compression ('yes') or irreversible('no'). Default is 'no'.
@@ -41,7 +41,7 @@ function [elapsedTime, time_for_blockcoding] = encode_HTJ2K(FileName, inputImg, 
 %                            Default is no tile uses PLT marker.
 % 'use_PPM', s             : use PPM marker segment ('yes'). Default is 'no'.
 % 'use_TLM', s             : use TLM marker segment ('yes'). Default is 'no'.
-% 'ochange', {d,d,d,d,d,s}, T : Progressive order change. {RS, CS, LYE, RE, CE, 'order' (see 'order')}. Default is no entry. 
+% 'ochange', {d,d,d,d,d,s}, T : Progressive order change. {RS, CS, LYE, RE, CE, 'order' (see 'order')}. Default is no entry.
 %
 % TODO: RGN, PLM, CRG, PRF, CPF markers and ERTERM processing
 %       HT SigProp and MagRef encoding (encoding moddules are ready, but construction of packet header is not yet perfectly done)
@@ -61,9 +61,9 @@ inputArgs = jp2_inputArguments(inputImg, FileName);
 % ROI is not yet implemented....
 ROImask = [];
 if isempty(inputArgs.ROI) == false
-    ROImask = zeros(size(inputImg,1), size(inputImg,2), 'logical');
-    ROImask(floor(inputArgs.ROI(1)*main_header.SIZ.Ysiz):floor((inputArgs.ROI(1)+inputArgs.ROI(3))*main_header.SIZ.Ysiz), ...
-        floor(inputArgs.ROI(2)*main_header.SIZ.Xsiz):floor((inputArgs.ROI(2)+inputArgs.ROI(4))*main_header.SIZ.Xsiz)) = 1;
+    ROImask = zeros(size(inputImg, 1), size(inputImg, 2), 'logical');
+    ROImask(floor(inputArgs.ROI(1) * main_header.SIZ.Ysiz):floor((inputArgs.ROI(1) + inputArgs.ROI(3)) * main_header.SIZ.Ysiz), ...
+        floor(inputArgs.ROI(2) * main_header.SIZ.Xsiz):floor((inputArgs.ROI(2) + inputArgs.ROI(4)) * main_header.SIZ.Xsiz)) = 1;
 end
 
 %% create codestream destination
@@ -80,16 +80,16 @@ time_for_blockcoding = 0;
 
 %% create tiles
 tile_Set = [];
-for q = 0:numTiles_y-1
-    for p = 0:numTiles_x-1
-        tx0 = max(main_header.SIZ.XTOsiz + p*main_header.SIZ.XTsiz, main_header.SIZ.XOsiz);
-        ty0 = max(main_header.SIZ.YTOsiz + q*main_header.SIZ.YTsiz, main_header.SIZ.YOsiz);
-        tx1 = min(main_header.SIZ.XTOsiz + (p+1)*main_header.SIZ.XTsiz, main_header.SIZ.Xsiz);
-        ty1 = min(main_header.SIZ.YTOsiz + (q+1)*main_header.SIZ.YTsiz, main_header.SIZ.Ysiz);
-        tile_Set = [tile_Set jp2_tile(numTiles_x, p, q, tx0, ty0, tx1, ty1)];
-        currentTile = tile_Set(p + q*numTiles_x + M_OFFSET);
-        currentTile.header = findobj(tilepart_header, 'idx', p + q*numTiles_x);
-        
+for q = 0:numTiles_y - 1
+    for p = 0:numTiles_x - 1
+        tx0 = max(main_header.SIZ.XTOsiz + p * main_header.SIZ.XTsiz, main_header.SIZ.XOsiz);
+        ty0 = max(main_header.SIZ.YTOsiz + q * main_header.SIZ.YTsiz, main_header.SIZ.YOsiz);
+        tx1 = min(main_header.SIZ.XTOsiz + (p + 1) * main_header.SIZ.XTsiz, main_header.SIZ.Xsiz);
+        ty1 = min(main_header.SIZ.YTOsiz + (q + 1) * main_header.SIZ.YTsiz, main_header.SIZ.Ysiz);
+        tile_Set = [tile_Set, jp2_tile(numTiles_x, p, q, tx0, ty0, tx1, ty1)];
+        currentTile = tile_Set(p + q * numTiles_x + M_OFFSET);
+        currentTile.header = findobj(tilepart_header, 'idx', p + q * numTiles_x);
+
         for c = 0:main_header.SIZ.Csiz - 1
             tcx0 = ceil_quotient_int(tx0, main_header.SIZ.XRsiz(c + M_OFFSET), 'uint32');
             tcx1 = ceil_quotient_int(tx1, main_header.SIZ.XRsiz(c + M_OFFSET), 'uint32');
@@ -97,13 +97,13 @@ for q = 0:numTiles_y-1
             tcy1 = ceil_quotient_int(ty1, main_header.SIZ.YRsiz(c + M_OFFSET), 'uint32');
             currentTile.components(c + M_OFFSET) = jp2_tile_component(c, tcx0, tcy0, tcx1, tcy1);
         end
-        
-        currentTile.buf = inputImg(currentTile.tile_pos_y + M_OFFSET: currentTile.tile_pos_y + int32(currentTile.tile_size_y), ...
-            currentTile.tile_pos_x + M_OFFSET: currentTile.tile_pos_x + int32(currentTile.tile_size_x), :);
+
+        currentTile.buf = inputImg(currentTile.tile_pos_y + M_OFFSET:currentTile.tile_pos_y + int32(currentTile.tile_size_y), ...
+            currentTile.tile_pos_x + M_OFFSET:currentTile.tile_pos_x + int32(currentTile.tile_size_x), :);
         % ROI is not yet implemented....
         if isempty(inputArgs.ROI) == false
-            currentTile.ROImask = ROImask(currentTile.tile_pos_y + M_OFFSET: currentTile.tile_pos_y + int32(currentTile.tile_size_y), ...
-                currentTile.tile_pos_x + M_OFFSET: currentTile.tile_pos_x + int32(currentTile.tile_size_x));
+            currentTile.ROImask = ROImask(currentTile.tile_pos_y + M_OFFSET:currentTile.tile_pos_y + int32(currentTile.tile_size_y), ...
+                currentTile.tile_pos_x + M_OFFSET:currentTile.tile_pos_x + int32(currentTile.tile_size_x));
         end
     end
 end
@@ -114,6 +114,7 @@ for tile_idx = 0:numTiles_y * numTiles_x - 1
     fprintf('==== Encoding tile %d ====\n', tile_idx);
     time_for_blockcoding_per_tile = encode_tile(use_MEX, tile_Set(tile_idx + M_OFFSET), main_header, inputArgs.rate);
     time_for_blockcoding = time_for_blockcoding + time_for_blockcoding_per_tile;
+
     %% set Psot value; length of compressed tile data (packet headers and its correcponding bodies)
     tileLength = 0;
     num_packet = length(tile_Set(tile_idx + M_OFFSET).packetInfo);
@@ -122,7 +123,7 @@ for tile_idx = 0:numTiles_y * numTiles_x - 1
             tileLength = tileLength + length(tile_Set(tile_idx + M_OFFSET).packetInfo(packet_idx).header);
         end
         tileLength = tileLength + length(tile_Set(tile_idx + M_OFFSET).packetInfo(packet_idx).body);
-        tileLength = tileLength + (use_SOP == true)*6; % taking SOP length into account
+        tileLength = tileLength + (use_SOP == true) * 6; % taking SOP length into account
     end
     if use_PPT(tile_idx + M_OFFSET) == true
         tile_Set(tile_idx + M_OFFSET).header.set_PPT(tile_Set(tile_idx + M_OFFSET));
@@ -133,9 +134,10 @@ for tile_idx = 0:numTiles_y * numTiles_x - 1
     tile_Set(tile_idx + M_OFFSET).header.set_length(uint32(tileLength));
     total_length = total_length + tile_Set(tile_idx + M_OFFSET).header.SOT.Psot;
 end
-total_length = total_length + 2;% add length of EOC
+total_length = total_length + 2; % add length of EOC
+
 %% output
-if endsWith(FileName, '.jp2', 'IgnoreCase',true) || endsWith(FileName, '.jph', 'IgnoreCase',true)
+if endsWith(FileName, '.jp2', 'IgnoreCase', true) || endsWith(FileName, '.jph', 'IgnoreCase', true)
     jp2Boxes = jp2_boxes(j2c_dst, 1);
     jp2Boxes.write_contents(main_header, total_length);
 end
@@ -163,7 +165,7 @@ for tile_idx = 0:numTiles_y * numTiles_x - 1
         % write packet bodies
         j2c_dst.put_N_byte(obj.body);
     end
-    
+
 end
 elapsedTime = toc(time_start);
 % write EOC marker

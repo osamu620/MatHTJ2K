@@ -29,9 +29,9 @@ classdef precinct_info < handle
             end
             outObj.size_x = size_x;
             outObj.size_y = size_y;
-            b_x_tab = int32([0 1 0 1]);
-            b_y_tab = int32([0 0 1 1]);
-            
+            b_x_tab = int32([0, 1, 0, 1]);
+            b_y_tab = int32([0, 0, 1, 1]);
+
             for b = 1:length(hBandInfo)
                 b_x = b_x_tab(hBandInfo(b).idx + 1);
                 b_y = b_y_tab(hBandInfo(b).idx + 1);
@@ -40,8 +40,8 @@ classdef precinct_info < handle
                 Etcrpb_y = ceil_quotient_int(Etcrp_y - b_y, 2^sr, 'int32');
                 Ftcrpb_x = ceil_quotient_int(Ftcrp_x - b_x, 2^sr, 'int32');
                 Ftcrpb_y = ceil_quotient_int(Ftcrp_y - b_y, 2^sr, 'int32');
-                
-                outObj.precinct_subbands = [outObj.precinct_subbands precinct_subband(x, y, hBandInfo(b).idx, Etcrpb_x, Etcrpb_y, uint32(Ftcrpb_x - Etcrpb_x), uint32(Ftcrpb_y - Etcrpb_y))];
+
+                outObj.precinct_subbands = [outObj.precinct_subbands, precinct_subband(x, y, hBandInfo(b).idx, Etcrpb_x, Etcrpb_y, uint32(Ftcrpb_x - Etcrpb_x), uint32(Ftcrpb_y - Etcrpb_y))];
                 outObj.precinct_subbands(b).dwt_coeffs = zeros(outObj.precinct_subbands(b).size_y, outObj.precinct_subbands(b).size_x);
                 outObj.precinct_subbands(b).quantized_coeffs = zeros(outObj.precinct_subbands(b).size_y, outObj.precinct_subbands(b).size_x);
             end
