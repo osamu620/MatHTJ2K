@@ -27,5 +27,5 @@ ARGS{1}{8} = coder.typeof(int32(0));
 ARGS{1}{9} = coder.typeof(uint8(0));
 
 %% Invoke MATLAB Coder.
-cd('/Users/osamu/Documents/MatHTJ2K/source/dwt');
+cd('./dwt');
 codegen -config cfg idwt_2d_sr -args ARGS{1} -nargout 1

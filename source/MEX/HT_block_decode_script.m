@@ -62,5 +62,5 @@ ARGS{1}{1}.Properties.mq_L = coder.typeof(int32(0));
 ARGS{1}{2} = coder.typeof(int32(0));
 
 %% Invoke MATLAB Coder.
-cd('/Users/osamu/Documents/MatHTJ2K/source/HTcodec/decoder');
+cd('./HTcodec/decoder');
 codegen -config cfg HT_block_decode -args ARGS{1} -nargout 2
