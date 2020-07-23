@@ -24,5 +24,5 @@ ARGS{1}{2} = coder.typeof(int32(0));
 ARGS{1}{3} = coder.typeof(uint16(0));
 
 %% Invoke MATLAB Coder.
-cd('/Users/osamu/Documents/MatHTJ2K/source/HTcodec/encoder');
+cd('./HTcodec/encoder');
 codegen -config cfg HT_block_encode -args ARGS{1} -nargout 3

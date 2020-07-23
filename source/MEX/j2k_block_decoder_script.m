@@ -62,5 +62,5 @@ ARGS{1}{1}.Properties.mq_L = coder.typeof(int32(0), [1, 165], [0, 1]);
 ARGS{1}{2} = coder.typeof(int32(0));
 
 %% Invoke MATLAB Coder.
-cd('/Users/osamu/Documents/MatHTJ2K/source/Tier1');
+cd('./Tier1');
 codegen -config cfg j2k_block_decoder -args ARGS{1} -nargout 2
