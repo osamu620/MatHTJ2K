@@ -118,7 +118,8 @@ while WORD == JP2markers.SOT
         end % processing for the first tile-part is ended here.
     else
         if DEBUG == 1
-            fprintf('\ttile_part index = %3d, tile_part length = %5d, num_tile_parts = %d\n', ...
+            fprintf('Tile_index = %3d, tile size (x,y) = (%3d,%3d)\n', tile_index, currentTile.tile_size_x, currentTile.tile_size_y);
+            fprintf('\ttile_part index = %d, tile_part length = %5d, num_tile_parts = %d\n', ...
                 tile_part_index, tile_part_length, num_tile_parts);
         end
 

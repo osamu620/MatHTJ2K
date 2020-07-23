@@ -181,4 +181,4 @@ end
 
 %% delete j2c_data_destination
 j2c_dst.delete;
-fprintf('%f, %f\n', elapsedTime, time_for_blockcoding);
+fprintf('Total:%f (sec), Block-coding: %f (sec)\n', elapsedTime, time_for_blockcoding);

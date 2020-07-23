@@ -191,4 +191,4 @@ elapsedTime = toc(time_start);
 %% end
 delete(j2c_source);
 
-fprintf('%f, %f\n', elapsedTime, time_for_blockcoding);
+fprintf('Total: %f (sec), Block-coding: %f (sec)\n', elapsedTime, time_for_blockcoding);
