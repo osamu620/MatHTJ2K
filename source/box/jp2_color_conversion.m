@@ -5,6 +5,7 @@ buf = composite_in;
 alpha = [];
 num_non_alpha = 0;
 if isempty(jp2Boxes.headerBox.cdef) == false
+    tmp = zeros([size(buf), main_header.SIZ.Csiz]);
     for c = 0:main_header.SIZ.Csiz - 1
         if jp2Boxes.headerBox.cdef.Typ_i(c + M_OFFSET) == 1
             alpha = buf(:, :, jp2Boxes.headerBox.cdef.Cn_i(c + M_OFFSET) + M_OFFSET) / max(max(buf(:, :, jp2Boxes.headerBox.cdef.Cn_i(c + M_OFFSET) + M_OFFSET)));
@@ -41,9 +42,10 @@ if isempty(jp2Boxes.headerBox.colr) == false
             case {'GREY', 'GRAY'}
                 fprintf('INFO: Embedde icc profile indicates Grayscale.\n');
                 cform = makecform('graytrc', iccProfile, 'Direction', 'inverse');
-                XYZ(:, :, 1) = zeros(size(composite_in));
+                XYZ = zeros([size(composite_in), 3]);
+                %XYZ(:, :, 1) = zeros(size(composite_in));
                 XYZ(:, :, 2) = composite_in;
-                XYZ(:, :, 3) = zeros(size(composite_in));
+                %XYZ(:, :, 3) = zeros(size(composite_in));
                 composite_out = applycform(XYZ / 2^(BPC + 1), cform);
                 composite_out = round(composite_out .* 2^(BPC + 1));
         end
@@ -68,6 +70,7 @@ if isempty(jp2Boxes.headerBox.colr) == false
             case 18 % sYCC
                 Lmin = 0;
                 Lmax = 255;
+                composite_tmp = zeros(size(composite_in));
                 composite_tmp(:, :, 1) = composite_in(:, :, 1) / Lmax;
                 composite_tmp(:, :, 2) = (composite_in(:, :, 2) - 128) / Lmax;
                 composite_tmp(:, :, 3) = (composite_in(:, :, 3) - 128) / Lmax;

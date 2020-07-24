@@ -55,6 +55,10 @@ classdef jp2_tile < handle
         end
         function composite_out = put_tile_into_composite_output(inObj, main_header, composite_out, reduce_NL)
             M_OFFSET = 1;
+            c_tx0 = zeros(1, main_header.SIZ.Csiz);
+            c_tx1 = zeros(1, main_header.SIZ.Csiz);
+            c_ty0 = zeros(1, main_header.SIZ.Csiz);
+            c_ty1 = zeros(1, main_header.SIZ.Csiz);
             for c = 0:main_header.SIZ.Csiz - 1
                 [~, codingStyleComponent] = get_coding_Styles(main_header, inObj.header, c);
                 c_NL = codingStyleComponent.get_number_of_decomposition_levels();

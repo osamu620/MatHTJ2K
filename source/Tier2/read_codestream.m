@@ -23,6 +23,7 @@ ty0 = currentTile.tile_pos_y;
 ty1 = currentTile.tile_pos_y + int32(currentTile.tile_size_y);
 
 codingStyle = get_coding_Styles(main_header, currentTile.header);
+c_NL = zeros(1, main_header.SIZ.Csiz);
 for c = 0:main_header.SIZ.Csiz - 1
     [codingStyle, codingStyleComponent] = get_coding_Styles(main_header, currentTile.header, c);
     c_NL(c + M_OFFSET) = codingStyleComponent.get_number_of_decomposition_levels();

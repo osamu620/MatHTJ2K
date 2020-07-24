@@ -576,12 +576,17 @@ classdef jp2_inputArguments < handle
             end
             main_header = j2k_main_header;
             [numTiles_x, numTiles_y, use_SOP, use_PPM, use_TLM, use_PPT, use_PLT] = main_header.create(inObj);
-            for i = 0:length(tilepart_header) - 1
-                tilepart_header(i + M_OFFSET).create_COD(inObj);
-                tilepart_header(i + M_OFFSET).create_QCD(inObj);
-                tilepart_header(i + M_OFFSET).create_COC(inObj, i, inObj.numComponents, main_header);
-                tilepart_header(i + M_OFFSET).create_QCC(inObj, i, inObj.numComponents, main_header);
-                tilepart_header(i + M_OFFSET).create_POC(inObj, main_header);
+            if isempty(tilepart_header) == false
+                for i = 0:length(tilepart_header) - 1
+                    tilepart_header(i + M_OFFSET).create_COD(inObj);
+                    tilepart_header(i + M_OFFSET).create_QCD(inObj);
+                    tilepart_header(i + M_OFFSET).create_COC(inObj, i, inObj.numComponents, main_header);
+                    tilepart_header(i + M_OFFSET).create_QCC(inObj, i, inObj.numComponents, main_header);
+                    tilepart_header(i + M_OFFSET).create_POC(inObj, main_header);
+                end
+            else % just create a SOT if no optional parameters were given
+                tilepart_header = j2k_tile_part_header(0);
+                tilepart_header(1).idx = 0;
             end
         end
     end
