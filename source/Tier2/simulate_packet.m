@@ -10,6 +10,7 @@ EPHlength = uint32(2);
 total_bytes_of_packet_header = SOTlength + SODlength;
 
 codingStyle = get_coding_Styles(main_header, hTile.header);
+c_NL = zeros(1, main_header.SIZ.Csiz);
 for c = 0:main_header.SIZ.Csiz - 1
     [codingStyle, codingStyleComponent] = get_coding_Styles(main_header, hTile.header, c);
     c_NL(c + M_OFFSET) = codingStyleComponent.get_number_of_decomposition_levels();

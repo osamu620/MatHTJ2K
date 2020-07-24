@@ -48,6 +48,7 @@ count = 1;
 for b = 1:currentResolution.num_band
     currentPband = currentPrecinct.precinct_subbands(b);
     if currentPband.size_x * currentPband.size_y ~= 0
+        number_of_bytes = zeros(1, currentPband.numCblksX * currentPband.numCblksY);
         for idx = 0:currentPband.numCblksX * currentPband.numCblksY - 1
             number_of_bytes(count) = parse_packet_header(packetHeader, l, currentPband, currentPband.Cblks(idx + M_OFFSET), main_header.Cap15_b14_15);
             if DEBUG == 1
