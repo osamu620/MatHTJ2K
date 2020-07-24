@@ -26,3 +26,4 @@
 *.raw -crlf -diff -merge
 *.rawl -crlf -diff -merge
 *.zip -crlf -diff -merge
+*.m linguist-language=MATLAB
