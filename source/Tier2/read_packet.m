@@ -13,10 +13,15 @@ Nsop = -1;
 % if SOP present
 if codingStyle.is_use_SOP() == true
     WORD = hDsrc.get_word();
-    assert(WORD == x_FF91);
-    Lsop = hDsrc.get_word();
-    assert(Lsop == 4);
-    Nsop = hDsrc.get_word();
+    if WORD == x_FF91
+        Lsop = hDsrc.get_word();
+        assert(Lsop == 4);
+        Nsop = hDsrc.get_word();
+    else
+        % SOP may not be present even SPcod says SOP was used
+        hDsrc.pos = hDsrc.pos - 2; % rewind 2 bytes
+        % Nsop shall be incremented no matter SOP is present or not
+    end
 end
 
 %% read packet header
