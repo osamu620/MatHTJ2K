@@ -252,7 +252,7 @@ while is_finish == false
                                     if hCodeblock.num_passes > 0
                                         cpb.is_zero_length = false;
                                     end
-                                    if is_finish == false
+                                    if is_finish == false && hCodeblock.Cmodes < 64
                                         hCodeblock.copy_from_vCodeblock(vCodeblock);
                                     end
                                 end
