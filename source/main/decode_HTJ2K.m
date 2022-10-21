@@ -9,6 +9,7 @@ function [output, composite_output, elapsedTime, time_for_blockcoding] = decode_
 % reduce_NL              : Set the number of highest resolution levels to be discarded.
 % (is_float_output       : experimental)
 % August 29, 2019 (c) Osamu WATANABE, Takushoku University and Vrije Universiteit Brussel
+% October 21, 2022 (c) Osamu WATANABE, Takushoku University
 %
 % TODO: ICC profile interpretation.
 M_OFFSET = 1;
@@ -56,7 +57,7 @@ end
 numXtiles = ceil_quotient_int((main_header.SIZ.Xsiz - main_header.SIZ.XTOsiz), main_header.SIZ.XTsiz, 'uint32');
 numYtiles = ceil_quotient_int((main_header.SIZ.Ysiz - main_header.SIZ.YTOsiz), main_header.SIZ.YTsiz, 'uint32');
 % buffer for decoded components
-output_YCbCr = cell(main_header.SIZ.Csiz, 1);
+output_RGB = cell(main_header.SIZ.Csiz, 1);
 % buffer for inverse Color transform (size of components will be adjusted for inverse color trafo)
 composite_output_RGB = zeros(ceil(double(main_header.SIZ.Ysiz) / 2^reduce_NL), ...
     ceil(double(main_header.SIZ.Xsiz) / 2^reduce_NL), main_header.SIZ.Csiz, 'double');
@@ -84,7 +85,7 @@ for n_tile = 1:length(tile_Set)
     currentTile.src_data.pos = 0;
     time_for_blockcoding = decode_tile(currentTile, main_header, PPM_header, use_MEX, reduce_NL, time_for_blockcoding);
     composite_output_RGB = currentTile.put_tile_into_composite_output(main_header, composite_output_RGB, reduce_NL);
-    output_YCbCr = currentTile.put_tile_into_output(main_header, output_YCbCr, reduce_NL);
+    output_RGB = currentTile.put_tile_into_output(main_header, output_RGB, reduce_NL);
 end
 
 %% put decoded tile image into extracted corrdinate from reference grid
@@ -92,7 +93,7 @@ y_origin = ceil(double(main_header.SIZ.YOsiz) / 2^reduce_NL);
 x_origin = ceil(double(main_header.SIZ.XOsiz) / 2^reduce_NL);
 composite_output_RGB = composite_output_RGB(y_origin + M_OFFSET:end, x_origin + M_OFFSET:end, :);
 for c = 0:main_header.SIZ.Csiz - 1
-    output_YCbCr{c+M_OFFSET} = output_YCbCr{c+M_OFFSET} ...
+    output_RGB{c+M_OFFSET} = output_RGB{c+M_OFFSET} ...
         (ceil_quotient_int(main_header.SIZ.YOsiz, main_header.SIZ.YRsiz(c + M_OFFSET) * 2^reduce_NL, 'int32') + M_OFFSET:end, ...
         ceil_quotient_int(main_header.SIZ.XOsiz, main_header.SIZ.XRsiz(c + M_OFFSET) * 2^reduce_NL, 'int32') + M_OFFSET:end);
 end
@@ -101,7 +102,7 @@ end
 is_signed = main_header.SIZ.get_is_signed();
 bitDepth = double(main_header.SIZ.get_RI());
 composite_output = composite_output_RGB;
-output = output_YCbCr;
+output = output_RGB;
 
 if is_float_output == true
     interpreted_as_int32 = int32(composite_output);
@@ -129,9 +130,7 @@ else
         DC_offset = 2^(BPC);
         if is_signed(c + M_OFFSET) == false
             composite_output(:, :, c + M_OFFSET) = composite_output_RGB(:, :, c + M_OFFSET) + DC_offset;
-            %             if c == 0
-            %                 output{c + M_OFFSET} = output{c + M_OFFSET} + DC_offset;
-            %             end
+            output{c + M_OFFSET} = output{c + M_OFFSET} + DC_offset;
         end
         % rounding to nearest integer
         composite_output(:, :, c + M_OFFSET) = round(composite_output(:, :, c + M_OFFSET));
@@ -148,6 +147,19 @@ else
         tmp(tmp > MAXVAL) = MAXVAL;
         tmp(tmp < MINVAL) = MINVAL;
         composite_output(:, :, c + M_OFFSET) = tmp;
+        
+        % clipping the dynamic range
+        tmp = output{c + M_OFFSET};
+        if is_signed(c + M_OFFSET) == false
+            MAXVAL = 2^bitDepth(c + M_OFFSET) - 1;
+            MINVAL = 0;
+        else
+            MAXVAL = 2^(bitDepth(c + M_OFFSET) - 1) - 1;
+            MINVAL = -2^(bitDepth(c + M_OFFSET) - 1);
+        end
+        tmp(tmp > MAXVAL) = MAXVAL;
+        tmp(tmp < MINVAL) = MINVAL;
+        output{c + M_OFFSET} = tmp;
     end
 end
 

@@ -154,4 +154,7 @@ if header_COD.get_multiple_component_transform() == 1
     else
         currentTile.composite_output = myycbcr2rgb(currentTile.composite_output, header_COD.get_transformation); %% mainCOD could be tilepart_COD
     end
+    currentTile.output{1} = currentTile.composite_output(:,:,1);
+    currentTile.output{2} = currentTile.composite_output(:,:,2);
+    currentTile.output{3} = currentTile.composite_output(:,:,3);
 end
