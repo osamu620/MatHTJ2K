@@ -15,6 +15,7 @@ classdef jp2_inputArguments < handle
         precincts(:, 2) {mustBePositive, mustBeInteger, mustBeLessThanOrEqual(precincts, 32768)}
         order(1, 1) {mustBeNonnegative, mustBeInteger, mustBeLessThanOrEqual(order, 4)} = 0
         qstep(1, 1) {mustBePositive, mustBeLessThanOrEqual(qstep, 2)} = 1 / 256
+        qfactor(1, 1) {mustBeInteger} = -1
         guard(1, 1) {mustBePositive, mustBeInteger, mustBeLessThanOrEqual(guard, 7)} = 1
         Cmodes(1, 1) {mustBeNonnegative, mustBeInteger} = 64
         use_SOP(1, :) char {mustBeMember(use_SOP, {'yes', 'no'})} = 'no'
@@ -191,6 +192,11 @@ classdef jp2_inputArguments < handle
                             end
                         case 'qstep'
                             inObj.qstep = argin{n+1};
+                        case 'Qfactor'
+                            inObj.qfactor = argin{n+1};
+                            if inObj.qfactor > 100
+                                error('Qfactor shall be in the range from 0 to 100.');
+                            end
                         case 'guard'
                             inObj.guard = argin{n+1};
                         case 'use_SOP'
@@ -222,96 +228,98 @@ classdef jp2_inputArguments < handle
                 end
 
                 %% main header: COC, QCC
-                n = 1;
-                while n < n_arg
-                    tnum = -1;
-                    cnum = -1;
-                    pos0 = strfind(argin{n}, ':');
-                    if isempty(pos0) == false
-                        pos_t = strfind(argin{n}(1:end), 'T');
-                        pos_c = strfind(argin{n}(1:end), 'C');
-                        if isempty(pos_t) == false
-                            n = n + 2;
-                            continue;
-                        else
-                            assert(isempty(cnum) == false);
-                            cnum = str2double(argin{n}(pos_c + 1:end));
-                            assert(cnum >= 0);
-                            obj = findobj(inObj.cParam, 'idx', cnum);
-                            if isempty(obj)
-                                inObj.cParam = [inObj.cParam, component_parameters(cnum)];
-                                obj = inObj.cParam(end);
-                                obj.parent = inObj;
+                if inObj.qfactor < 0 % if Qfactor is set, ignore following
+                    n = 1;
+                    while n < n_arg
+                        tnum = -1;
+                        cnum = -1;
+                        pos0 = strfind(argin{n}, ':');
+                        if isempty(pos0) == false
+                            pos_t = strfind(argin{n}(1:end), 'T');
+                            pos_c = strfind(argin{n}(1:end), 'C');
+                            if isempty(pos_t) == false
+                                n = n + 2;
+                                continue;
+                            else
+                                assert(isempty(cnum) == false);
+                                cnum = str2double(argin{n}(pos_c + 1:end));
+                                assert(cnum >= 0);
+                                obj = findobj(inObj.cParam, 'idx', cnum);
+                                if isempty(obj)
+                                    inObj.cParam = [inObj.cParam, component_parameters(cnum)];
+                                    obj = inObj.cParam(end);
+                                    obj.parent = inObj;
+                                end
                             end
-                        end
-                        pname = argin{n}(1:pos0 - 1);
+                            pname = argin{n}(1:pos0 - 1);
 
-                        assert(tnum < numTiles);
-                        assert(cnum < inObj.numComponents);
+                            assert(tnum < numTiles);
+                            assert(cnum < inObj.numComponents);
 
-                        switch pname
-                            case 'levels'
-                                obj.levels = argin{n+1};
-                            case 'reversible'
-                                obj.reversible = argin{n+1};
-                            case 'cmodes'
-                                block_coding_mode = regexp(argin{n + 1}, '\|', 'split');
-                                modeFlag = 0;
-                                if isempty(block_coding_mode) == false
-                                    for i = 1:length(block_coding_mode)
-                                        switch block_coding_mode{i}
-                                            case ''
-                                                % no mode specified.
-                                            case 'BYPASS'
-                                                modeFlag = modeFlag + 1;
-                                            case 'RESET'
-                                                modeFlag = modeFlag + 2;
-                                            case 'RESTART'
-                                                modeFlag = modeFlag + 4;
-                                            case 'CAUSAL'
-                                                modeFlag = modeFlag + 8;
-                                            case 'ERTERM'
-                                                modeFlag = modeFlag + 16;
-                                            case 'SEGMARK'
-                                                modeFlag = modeFlag + 32;
-                                            case 'HT'
-                                                modeFlag = modeFlag + 64;
-                                            otherwise
-                                                error('unknown block coding mode is specified.');
+                            switch pname
+                                case 'levels'
+                                    obj.levels = argin{n+1};
+                                case 'reversible'
+                                    obj.reversible = argin{n+1};
+                                case 'cmodes'
+                                    block_coding_mode = regexp(argin{n + 1}, '\|', 'split');
+                                    modeFlag = 0;
+                                    if isempty(block_coding_mode) == false
+                                        for i = 1:length(block_coding_mode)
+                                            switch block_coding_mode{i}
+                                                case ''
+                                                    % no mode specified.
+                                                case 'BYPASS'
+                                                    modeFlag = modeFlag + 1;
+                                                case 'RESET'
+                                                    modeFlag = modeFlag + 2;
+                                                case 'RESTART'
+                                                    modeFlag = modeFlag + 4;
+                                                case 'CAUSAL'
+                                                    modeFlag = modeFlag + 8;
+                                                case 'ERTERM'
+                                                    modeFlag = modeFlag + 16;
+                                                case 'SEGMARK'
+                                                    modeFlag = modeFlag + 32;
+                                                case 'HT'
+                                                    modeFlag = modeFlag + 64;
+                                                otherwise
+                                                    error('unknown block coding mode is specified.');
+                                            end
                                         end
                                     end
-                                end
-                                if bitand(bitshift(modeFlag, -6), 1) == true
-                                    % 183 = 10110111
-                                    assert(bitand(modeFlag, 183) == 0, 'When HT is present, only CAUSAL can be used together.');
-                                end
-                                obj.Cmodes = modeFlag;
-                            case 'blk'
-                                tmpblk = argin{n+1};
-                                assert(log2(tmpblk(1)) == floor(log2(tmpblk(1))) && ...
-                                    log2(tmpblk(2)) == floor(log2(tmpblk(2))), 'Codeblock size shall be power of two.')
-                                assert(tmpblk(1) * tmpblk(2) <= 4096, ...
-                                    'Each value in code block size [Cy Cx], Cy*Cx shall be equal to or less than 4096.');
-                                obj.blk = tmpblk;
-                            case 'use_precincts'
-                                obj.use_precincts = argin{n+1};
-                            case 'precincts'
-                                tmpprecincts = argin{n+1};
-                                for i = 1:size(tmpprecincts, 1)
-                                    assert(log2(tmpprecincts(i, 1)) == floor(log2(tmpprecincts(i, 1))) && ...
-                                        log2(tmpprecincts(i, 2)) == floor(log2(tmpprecincts(i, 2))), 'Precinct size shall be power of two.')
-                                end
-                                obj.precincts = tmpprecincts;
-                                obj.use_precincts = 'yes';
-                            case 'qstep'
-                                obj.qstep = argin{n+1};
-                            case 'guard'
-                                obj.guard = argin{n+1};
-                            otherwise
-                                error('Unknown attribute for COC or QCC ''%s''.\n', argin{n});
+                                    if bitand(bitshift(modeFlag, -6), 1) == true
+                                        % 183 = 10110111
+                                        assert(bitand(modeFlag, 183) == 0, 'When HT is present, only CAUSAL can be used together.');
+                                    end
+                                    obj.Cmodes = modeFlag;
+                                case 'blk'
+                                    tmpblk = argin{n+1};
+                                    assert(log2(tmpblk(1)) == floor(log2(tmpblk(1))) && ...
+                                        log2(tmpblk(2)) == floor(log2(tmpblk(2))), 'Codeblock size shall be power of two.')
+                                    assert(tmpblk(1) * tmpblk(2) <= 4096, ...
+                                        'Each value in code block size [Cy Cx], Cy*Cx shall be equal to or less than 4096.');
+                                    obj.blk = tmpblk;
+                                case 'use_precincts'
+                                    obj.use_precincts = argin{n+1};
+                                case 'precincts'
+                                    tmpprecincts = argin{n+1};
+                                    for i = 1:size(tmpprecincts, 1)
+                                        assert(log2(tmpprecincts(i, 1)) == floor(log2(tmpprecincts(i, 1))) && ...
+                                            log2(tmpprecincts(i, 2)) == floor(log2(tmpprecincts(i, 2))), 'Precinct size shall be power of two.')
+                                    end
+                                    obj.precincts = tmpprecincts;
+                                    obj.use_precincts = 'yes';
+                                case 'qstep'
+                                    obj.qstep = argin{n+1};
+                                case 'guard'
+                                    obj.guard = argin{n+1};
+                                otherwise
+                                    error('Unknown attribute for COC or QCC ''%s''.\n', argin{n});
+                            end
                         end
+                        n = n + 2;
                     end
-                    n = n + 2;
                 end
 
                 %% tilepart: COD, QCD, POC, PPT

@@ -30,6 +30,7 @@ function [elapsedTime, time_for_blockcoding] = encode_HTJ2K(FileName, inputImg, 
 % 'order', s, T            : Progression order ('LRCP', 'RLCP', 'RPCL', 'PCRL', 'CPRL')
 %                            Default is 'LRCP'.
 % 'qstep', f, TC           : Base step size for quantization, in most case,  0 < base_stepsize <= 2.0
+% 'Qfactor', d             : Qfactor, 0 to 100, 0: Lowest quality, 100: Highest quality.
 % 'guard', d, TC           : Number of guard bits, 1 is default. 0 <= GuardBits <= 7.
 % 'use_SOP', s, T          : use SOP marker segment ('yes'). Default is 'no'.
 % 'use_EPH', s, T          : use EPH marker ('yes'). Default is 'no'.

@@ -159,10 +159,65 @@ classdef j2k_main_header < handle
                 Wb = weight_mse(inputArgs.levels, transformation);
                 exponent = zeros(1, 3 * inputArgs.levels + 1, 'uint16');
                 mantissa = zeros(1, 3 * inputArgs.levels + 1, 'uint16');
-                for i = 1:length(Wb)
-                    [exponent(i), mantissa(i)] = step_to_eps_mu(Wb(i), inputArgs.qstep);
-                end
-                inObj.QCD = QCD_marker(inputArgs.guard, inputArgs.levels, transformation, is_derived, exponent, mantissa);
+                %% QFACTOR
+                if inputArgs.qfactor >= 0
+                    Gc = sqrt(calculate_color_gain);
+                    for ncompt = 0:2
+                        RI = inputArgs.bitDepth;
+                        Wb_C = ones(size(Wb));
+                        idx = 2;
+                        for nb = inputArgs.levels:-1:1
+                            for b = 1:3
+                                Wb_C(idx) = get_CSF_weight(ncompt, nb, b);
+                                idx = idx + 1;
+                            end
+                        end
+                        eps = sqrt(0.5) / 2^RI;
+                        % thresholds
+                        t0 = 65;
+                        t1 = 97;
+                        a_t0 = 0.04;
+                        a_t1 = 0.10;
+                        M_t0 = 2.0 * (1.0 - t0 / 100);
+                        M_t1 = 2.0 * (1.0 - t1 / 100);
+
+                        % Defaults
+                        alpha_Q = a_t0;
+                        qfactor_power = 1.0;
+
+                        M_Q = 0;
+                        if inputArgs.qfactor < 50
+                            M_Q = 50 / inputArgs.qfactor;
+                        else
+                            M_Q = 2.0 * (1.0 - inputArgs.qfactor / 100);
+                        end
+
+                        % adjust the scaling
+                        if inputArgs.qfactor >= t1
+                            qfactor_power = 0.0;
+                            alpha_Q       = a_t1;
+                        elseif inputArgs.qfactor > t0
+                            qfactor_power = (log(M_t1) - log(M_Q)) / (log(M_t1) - log(M_t0));
+                            alpha_Q       = a_t1 * (a_t0 / a_t1) ^ qfactor_power;
+                        end
+                        Wb_C = Wb_C .^ qfactor_power;
+                        delta_ref = alpha_Q * M_Q * Gc(1) + eps;
+                        for i = 1:length(Wb)
+                            [exponent(i), mantissa(i)] = step_to_eps_mu(Wb(i), delta_ref, Wb_C(i) * Gc(ncompt + 1));
+                        end
+                        if ncompt == 0
+                            inObj.QCD = QCD_marker(inputArgs.guard, inputArgs.levels, transformation, is_derived, exponent, mantissa);
+                        else
+                            inObj.QCC = [inObj.QCC, QCC_marker(inObj.SIZ.Csiz, ncompt, inputArgs.guard, inputArgs.levels, transformation, is_derived, exponent, mantissa)];
+                        end
+                    end
+                else
+                    %% No QFACTOR
+                    for i = 1:length(Wb)
+                        [exponent(i), mantissa(i)] = step_to_eps_mu(Wb(i), inputArgs.qstep);
+                    end
+                    inObj.QCD = QCD_marker(inputArgs.guard, inputArgs.levels, transformation, is_derived, exponent, mantissa);
+                end    
             end
 
             %% create parameter set for COC marker segment

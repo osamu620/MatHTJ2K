@@ -3,6 +3,7 @@ codegen/
 *.mexmaci64
 *.mexw64
 *.mexa64
+*.asv
 *.j2c
 *.jp2
 *.j2k
