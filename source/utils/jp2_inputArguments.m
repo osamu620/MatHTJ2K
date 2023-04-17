@@ -36,14 +36,9 @@ classdef jp2_inputArguments < handle
         function outObj = jp2_inputArguments(inputImg, FileName)
             [outObj.img_size_y, outObj.img_size_x, outObj.numComponents] = size(inputImg);
             outObj.tile = [outObj.img_size_y, outObj.img_size_x];
+            outObj.bitDepth = ceil(log2(max(double(inputImg(:)))));
             origClass = class(inputImg);
             switch origClass
-                case {'uint8', 'int8'}
-                    outObj.bitDepth = 8;
-                case {'uint16', 'int16'}
-                    outObj.bitDepth = 16;
-                case {'uint32', 'int32'}
-                    outObj. bitDepth = 31;
                 case 'single'
                     outObj.bitDepth = 31;
                 case 'double'

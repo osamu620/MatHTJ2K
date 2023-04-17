@@ -3,7 +3,7 @@ function time_for_blockcoding = encode_tile(use_MEX, hTile, main_header, target_
 M_OFFSET = 1;
 DEBUG = 0; % If this is set to 1, some information will be shown.
 
-RI = main_header.SIZ.get_RI();
+RI = double(main_header.SIZ.get_RI());
 color_gain = calculate_color_gain;
 
 buf = hTile.buf;
