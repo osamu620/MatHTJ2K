@@ -41,9 +41,13 @@ classdef jp2_inputArguments < handle
                 case 'single'
                     outObj.bitDepth = 31;
                 case 'double'
-                    error('Class %s of input image is currently not supported\n', origClass);
+                    error('Class %s of input image is currently not supported\n', origClass);block
                 otherwise
-                    outObj.bitDepth = ceil(log2(max(double(inputImg(:)))));
+                    tmp = ceil(log2(max(double(inputImg(:)))));
+                    if tmp < 8
+                        tmp = 8;
+                    end
+                    outObj.bitDepth = tmp;
             end
             if endsWith(FileName, '.jp2', 'IgnoreCase', true)
                 outObj.Cmodes = 0;
