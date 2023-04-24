@@ -36,7 +36,6 @@ classdef jp2_inputArguments < handle
         function outObj = jp2_inputArguments(inputImg, FileName)
             [outObj.img_size_y, outObj.img_size_x, outObj.numComponents] = size(inputImg);
             outObj.tile = [outObj.img_size_y, outObj.img_size_x];
-            outObj.bitDepth = ceil(log2(max(double(inputImg(:)))));
             origClass = class(inputImg);
             switch origClass
                 case 'single'
@@ -44,7 +43,7 @@ classdef jp2_inputArguments < handle
                 case 'double'
                     error('Class %s of input image is currently not supported\n', origClass);
                 otherwise
-                    error('Class %s of input image is not supported\n', origClass);
+                    outObj.bitDepth = ceil(log2(max(double(inputImg(:)))));
             end
             if endsWith(FileName, '.jp2', 'IgnoreCase', true)
                 outObj.Cmodes = 0;
